@@ -35,7 +35,7 @@ def convertion6k(fname):
 
 def cropInputFile(fname):
     #stream = ffmpeg.input(fname+'.mp4').filter('trim',duration=33.3) to just give an overall length
-    stream = ffmpeg.input(fname+'.mp4').filter('trim',start=33.3,end=50.0)
+    stream = ffmpeg.input(fname+'.mp4').filter('trim',start=33.3,end=50.0) #not 100% working
     stream = ffmpeg.output(stream, fname+'_trimmed.mp4')
     ffmpeg.run(stream)
     print("6K Conversion Complete!")
@@ -44,7 +44,7 @@ def main():
     videoInformation("Waterfall")
     #convertion4k("Waterfall")
     #convertion6k("Waterfall")
-    cropInputFile('Waterfall')
+    #cropInputFile('Waterfall')
 
 if __name__ == "__main__":
     main()
