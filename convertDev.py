@@ -34,17 +34,6 @@ def show_exception_and_exit(exc_type, exc_value, tb):
     input("Press key to exit.")
     sys.exit(-1)
 
-def videoInformation(fname):
-    probe = ffmpeg.probe(fname)
-    video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
-    width = int(video_stream['width'])
-    height = int(video_stream['height'])
-
-    print("Video Name - "+str(fname))
-    print("Video Width - "+str(width))
-    print("Video Height - "+str(height))
-    print("                           ")
-
 def convertion4k(fname):
     #resoltuion at 4096/2048
     stream = ffmpeg.input(fname)
@@ -231,7 +220,6 @@ class Ui_MainWindow(object):
         self.Radio_4K.clicked.connect(lambda: self.radio_check())
         self.Radio_6K.clicked.connect(lambda: self.radio_check())
         self.Radio_Both.clicked.connect(lambda: self.radio_check())
-
         
 
     def retranslateUi(self, MainWindow):
@@ -278,8 +266,30 @@ class Ui_MainWindow(object):
         final_location = fileLocation.replace('[','').replace(']','')
         final_location  = "file:"+final_location[1:-1]
         fileLocation = final_location
-        print("btn clicked - " + fileLocation)
-        videoInformation(fileLocation)
+        self.videoInformation(fileLocation)
+        
+
+
+    def videoInformation(self,fname):
+        probe = ffmpeg.probe(fname)
+        video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+        width = int(video_stream['width'])
+        height = int(video_stream['height'])
+
+        #print("Video Name - "+str(fname))
+        #print("Video Width - "+str(width))
+        #print("Video Height - "+str(height))
+        #print("                           ")
+
+        file_index = len(fname.split('/')) - 1
+        filename_short = fname.split('/')
+        filename_short = filename_short[file_index]
+        
+        #print(filename_short)
+
+        self.VideoNameInput.setText(str(filename_short))
+        self.VideoWidthInput.setText(str(width))
+        self.VideoHeightInput.setText(str(height))
 
     def convert_btn_clicked (self):        
         if (radiobtn_4 == True):
