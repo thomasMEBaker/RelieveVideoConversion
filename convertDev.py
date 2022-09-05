@@ -18,6 +18,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
 from PyQt5.uic import loadUi
 
+#include <QPixmap>
+
+
 radiobtn_4 = False
 radiobtn_6 = False
 radiobtn_both = False
@@ -34,6 +37,18 @@ def show_exception_and_exit(exc_type, exc_value, tb):
     traceback.print_exception(exc_type, exc_value, tb)
     input("Press key to exit.")
     sys.exit(-1)
+
+
+def generate_thumbnail(fname):
+    (
+    ffmpeg
+    .input(fname, ss=1.00)
+    .filter('scale', 600, -1)
+    .output("tmp.jpg", vframes=1)
+    .run()
+    )
+    
+
 
 def convertion4k(fname):
     #resoltuion at 4096/2048
@@ -315,15 +330,19 @@ class Ui_MainWindow(object):
         #need to look at the cancel error
         global fileLocation
         fileList = QFileDialog.getOpenFileNames(None, "Select Directory","D:\\")
-        if fileList != ():
-            fileLocation = str(fileList[0])
-            final_location = fileLocation.replace('[','').replace(']','')
-            final_location  = "file:"+final_location[1:-1]
-            fileLocation = final_location
-            self.videoInformation(fileLocation)
-        else:
-            print("Tuple is empty")
-        
+        fileLocation = str(fileList[0])
+        final_location = fileLocation.replace('[','').replace(']','')
+        final_location  = "file:"+final_location[1:-1]
+        fileLocation = final_location
+        self.videoInformation(fileLocation)
+        generate_thumbnail(fileLocation)
+
+        #FIRST THING SORT THE IMAGES
+
+
+        #pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/logo.png"))
+
+  
 
     def location_btn_clicked(self):
         global saveLocation
