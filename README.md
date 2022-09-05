@@ -12,3 +12,7 @@ pyinstaller -F --paths=<your_path>\Lib\site-packages  yourprogram.py
 running into "ImportError" you might consider side-packages.
 
  pip install pynput==1.6.8
+
+important 
+
+pyuic5 -x testGUI.ui -o test.py to generate from QT to py file
