@@ -22,6 +22,7 @@ radiobtn_4 = False
 radiobtn_6 = False
 radiobtn_both = False
 
+fileLocation = ""
 videoName = ""
 videoWidth = ""
 videoHeight = ""
@@ -34,7 +35,7 @@ def show_exception_and_exit(exc_type, exc_value, tb):
     sys.exit(-1)
 
 def videoInformation(fname):
-    probe = ffmpeg.probe(fname + ".mp4")
+    probe = ffmpeg.probe(fname)
     video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
     width = int(video_stream['width'])
     height = int(video_stream['height'])
@@ -46,7 +47,7 @@ def videoInformation(fname):
 
 def convertion4k(fname):
     #resoltuion at 4096/2048
-    stream = ffmpeg.input(fname+'.mp4')
+    stream = ffmpeg.input(fname)
     stream = ffmpeg.filter(stream,"scale",4096,2048)
     stream = ffmpeg.output(stream, fname+'4K_Tablet.mp4')
     ffmpeg.run(stream)
@@ -54,7 +55,7 @@ def convertion4k(fname):
 
 def convertion6k(fname):
     #resoltuion at 5760/2880
-    stream = ffmpeg.input(fname+'.mp4')
+    stream = ffmpeg.input(fname)
     stream = ffmpeg.filter(stream,"scale",5760,2880)
     stream = ffmpeg.output(stream, fname+'6K_Headset.mp4')
     ffmpeg.run(stream)
@@ -89,23 +90,6 @@ def add_path_variable():
     
     path = os.environ.get('PATH')
     print(path)
-
-def main():
-    sys.excepthook = show_exception_and_exit
-    add_path_variable()
-    #print("Subprocess Exists - " + str(module_exists("subprocess")))
-    #if (module_exists("ffmpeg")):
-        #print("ffmpeg Exists - " + str(module_exists("ffmpeg")))
-        #videopath = input(str("Please enter video path"))
-        #videoInformation(videopath)
-        #    convertion4k(videopath)
-        #    convertion6k(videopath)
-        #    cropInputFile(videopath)
-        #    input("Press any button to exit")
-    #else:
-     #   print("Module Not Found - " + str(module_exists("ffmpeg")))
-      #  input("Press any button to exit")
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -288,25 +272,42 @@ class Ui_MainWindow(object):
             radiobtn_4 = False
         
     def file_btn_clicked (self):
-        print("button clicked")
-        #fname=QFileDialog.getOpenFileName(self,"Open Video File","D:") #original but issues
-        file = str(QFileDialog.getOpenFileNames(None, "Select Directory","D:\\"))
-        
-        print(file)
+        global fileLocation
+        fileList = QFileDialog.getOpenFileNames(None, "Select Directory","D:\\")
+        fileLocation = str(fileList[0])
+        final_location = fileLocation.replace('[','').replace(']','')
+        final_location  = "file:"+final_location[1:-1]
+        fileLocation = final_location
+        print("btn clicked - " + fileLocation)
+        videoInformation(fileLocation)
 
-
-           
     def convert_btn_clicked (self):        
         if (radiobtn_4 == True):
-            convertion4k("input")
+            convertion4k(fileLocation)
         elif (radiobtn_6 == True):
-            convertion6k("input")
+            convertion6k(fileLocation)
         elif (radiobtn_both == True):
-            convertion4k("input")
-            convertion6k("input")
+            convertion4k(fileLocation)
+            convertion6k(fileLocation)
+
+    def add_path_variable():
+        if sys.platform == 'win32':
+            sep = ';'
+        else:
+            sep = ':'
+
+        directory = os.getcwd() 
+        directory = directory + "\FFmpeg\\bin"
+        print(directory)
+
+        os.environ['PATH'] += sep + directory
+    
+        path = os.environ.get('PATH')
+        print(path)
             
 if __name__ == "__main__":
-    main()
+    sys.excepthook = show_exception_and_exit
+    add_path_variable()
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
