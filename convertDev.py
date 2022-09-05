@@ -23,6 +23,7 @@ radiobtn_6 = False
 radiobtn_both = False
 
 fileLocation = ""
+saveLocation = ""
 videoName = ""
 videoWidth = ""
 videoHeight = ""
@@ -38,7 +39,11 @@ def convertion4k(fname):
     #resoltuion at 4096/2048
     stream = ffmpeg.input(fname)
     stream = ffmpeg.filter(stream,"scale",4096,2048)
-    stream = ffmpeg.output(stream, fname+'4K_Tablet.mp4')
+    mp4_removal = os.path.splitext(fname)[0]
+    name_size = len(mp4_removal.split('/')) - 1
+    filename_split = mp4_removal.split('/')
+    name = filename_split[name_size]
+    stream = ffmpeg.output(stream, saveLocation+"/"+name+'4K_Tablet.mp4')
     ffmpeg.run(stream)
     print("4K Conversion Complete!")
 
@@ -46,15 +51,20 @@ def convertion6k(fname):
     #resoltuion at 5760/2880
     stream = ffmpeg.input(fname)
     stream = ffmpeg.filter(stream,"scale",5760,2880)
-    stream = ffmpeg.output(stream, fname+'6K_Headset.mp4')
+    mp4_removal = os.path.splitext(fname)[0]
+    name_size = len(mp4_removal.split('/')) - 1
+    filename_split = mp4_removal.split('/')
+    name = filename_split[name_size]
+    stream = ffmpeg.output(stream, saveLocation+"/"+name+'6K_Headset.mp4')
     ffmpeg.run(stream)
     print("6K Conversion Complete!")
 
 def cropInputFile(fname):
+    #not currently implemented! 
     #stream = ffmpeg.input(fname+'.mp4').filter('trim',duration=33.3) to just give an overall length
-    stream = ffmpeg.input(fname+'.mp4').filter('trim',start=33.3,end=50.0) #not 100% working
-    stream = ffmpeg.output(stream, fname+'_trimmed.mp4')
-    ffmpeg.run(stream)
+    #stream = ffmpeg.input(fname+'.mp4').filter('trim',start=33.3,end=50.0) #not 100% working
+    #stream = ffmpeg.output(stream, fname+'_trimmed.mp4')
+    #ffmpeg.run(stream)
     print("6K Conversion Complete!")
 
 def module_exists(module_name):
@@ -83,7 +93,7 @@ def add_path_variable():
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 800)
+        MainWindow.resize(908, 800)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -129,7 +139,7 @@ class Ui_MainWindow(object):
         self.AdvancedSettingsLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.AdvancedSettingsLabel.setObjectName("AdvancedSettingsLabel")
         self.ConvertBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.ConvertBtn.setGeometry(QtCore.QRect(280, 520, 251, 71))
+        self.ConvertBtn.setGeometry(QtCore.QRect(220, 610, 371, 71))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.ConvertBtn.setFont(font)
@@ -152,6 +162,7 @@ class Ui_MainWindow(object):
         self.VideoNameLabel.setObjectName("VideoNameLabel")
         self.VideoNameInput = QtWidgets.QLabel(self.centralwidget)
         self.VideoNameInput.setGeometry(QtCore.QRect(420, 330, 251, 31))
+        self.VideoNameInput.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -198,9 +209,19 @@ class Ui_MainWindow(object):
         self.label.setAutoFillBackground(False)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
+        self.SaveLocationButton = QtWidgets.QPushButton(self.centralwidget)
+        self.SaveLocationButton.setGeometry(QtCore.QRect(280, 570, 251, 31))
+        self.SaveLocationButton.setObjectName("SaveLocationButton")
+        self.BitrateInput = QtWidgets.QTextEdit(self.centralwidget)
+        self.BitrateInput.setGeometry(QtCore.QRect(400, 530, 101, 31))
+        self.BitrateInput.setObjectName("BitrateInput")
+        self.BitrateLabel = QtWidgets.QLabel(self.centralwidget)
+        self.BitrateLabel.setGeometry(QtCore.QRect(320, 530, 81, 31))
+        self.BitrateLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.BitrateLabel.setObjectName("BitrateLabel")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 908, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -210,10 +231,13 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
-        #open file button - currently not functioning, just prints video information
+        #open file button
         self.FileBtn.clicked.connect(lambda: self.file_btn_clicked())
 
+        #save location button
+        self.SaveLocationButton.clicked.connect(lambda: self.location_btn_clicked())
 
+        
         #convert files button
         self.ConvertBtn.clicked.connect(lambda: self.convert_btn_clicked())
         
@@ -225,6 +249,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        #MainWindow.setFixedSize(1000,1000) not need but may be usefull
         self.FileBtn.setText(_translate("MainWindow", "Open File"))
         self.TitleLabel.setText(_translate("MainWindow", "ROVR Relieve - Video Conversion Tool"))
         self.VideoOutputLabel.setText(_translate("MainWindow", "Video Output Settings"))
@@ -241,6 +266,8 @@ class Ui_MainWindow(object):
         self.VideoHeightLabel.setText(_translate("MainWindow", "Video Height :"))
         self.VideoHeightInput.setText(_translate("MainWindow", "n/a"))
         self.label.setText(_translate("MainWindow", "No Video Image"))
+        self.SaveLocationButton.setText(_translate("MainWindow", "Save Location"))
+        self.BitrateLabel.setText(_translate("MainWindow", "Bitrate"))
 
     def radio_check(self):
         global radiobtn_4
@@ -267,7 +294,15 @@ class Ui_MainWindow(object):
         final_location  = "file:"+final_location[1:-1]
         fileLocation = final_location
         self.videoInformation(fileLocation)
-        
+
+
+    def location_btn_clicked(self):
+        global saveLocation
+        directoryPath=QFileDialog.getExistingDirectory(None, "Get Any File");
+        #print(directoryPath);
+        final_save_location = "file:"+directoryPath
+        saveLocation = final_save_location
+        print(saveLocation);
 
 
     def videoInformation(self,fname):

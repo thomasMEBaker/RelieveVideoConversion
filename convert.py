@@ -10,15 +10,11 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-radiobtn_4 = False
-radiobtn_6 = False
-radiobtn_both = False
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 800)
+        MainWindow.resize(908, 800)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -64,7 +60,7 @@ class Ui_MainWindow(object):
         self.AdvancedSettingsLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.AdvancedSettingsLabel.setObjectName("AdvancedSettingsLabel")
         self.ConvertBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.ConvertBtn.setGeometry(QtCore.QRect(280, 520, 251, 71))
+        self.ConvertBtn.setGeometry(QtCore.QRect(220, 610, 371, 71))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.ConvertBtn.setFont(font)
@@ -87,6 +83,7 @@ class Ui_MainWindow(object):
         self.VideoNameLabel.setObjectName("VideoNameLabel")
         self.VideoNameInput = QtWidgets.QLabel(self.centralwidget)
         self.VideoNameInput.setGeometry(QtCore.QRect(420, 330, 251, 31))
+        self.VideoNameInput.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -133,9 +130,19 @@ class Ui_MainWindow(object):
         self.label.setAutoFillBackground(False)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
+        self.SaveLocationButton = QtWidgets.QPushButton(self.centralwidget)
+        self.SaveLocationButton.setGeometry(QtCore.QRect(280, 570, 251, 31))
+        self.SaveLocationButton.setObjectName("SaveLocationButton")
+        self.BitrateInput = QtWidgets.QTextEdit(self.centralwidget)
+        self.BitrateInput.setGeometry(QtCore.QRect(400, 530, 101, 31))
+        self.BitrateInput.setObjectName("BitrateInput")
+        self.BitrateLabel = QtWidgets.QLabel(self.centralwidget)
+        self.BitrateLabel.setGeometry(QtCore.QRect(320, 530, 81, 31))
+        self.BitrateLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.BitrateLabel.setObjectName("BitrateLabel")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 908, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -164,6 +171,8 @@ class Ui_MainWindow(object):
         self.VideoHeightLabel.setText(_translate("MainWindow", "Video Height :"))
         self.VideoHeightInput.setText(_translate("MainWindow", "n/a"))
         self.label.setText(_translate("MainWindow", "No Video Image"))
+        self.SaveLocationButton.setText(_translate("MainWindow", "Save Location"))
+        self.BitrateLabel.setText(_translate("MainWindow", "Bitrate"))
 
 
 if __name__ == "__main__":

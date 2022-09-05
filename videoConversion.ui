@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>908</width>
     <height>800</height>
    </rect>
   </property>
@@ -142,9 +142,9 @@
    <widget class="QPushButton" name="ConvertBtn">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>520</y>
-      <width>251</width>
+      <x>220</x>
+      <y>610</y>
+      <width>371</width>
       <height>71</height>
      </rect>
     </property>
@@ -209,6 +209,12 @@
       <width>251</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
     </property>
     <property name="font">
      <font>
@@ -335,14 +341,53 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QPushButton" name="SaveLocationButton">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>570</y>
+      <width>251</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Save Location</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="BitrateInput">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>530</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="BitrateLabel">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>530</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Bitrate</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>21</height>
+     <width>908</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
