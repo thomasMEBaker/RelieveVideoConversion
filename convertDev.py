@@ -294,9 +294,14 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
+        #Media player
         self.mediaplayer = QMediaPlayer(None,QMediaPlayer.VideoSurface)
         
         self.mediaplayer.setVideoOutput(self.VideoDisplay)
+
+        self.mediaplayer.positionChanged.connect(self.position_changed)
+        self.mediaplayer.durationChanged.connect(self.duration_changed)
+        self.horizontalSlider.sliderMoved.connect(self.set_position)
         
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -371,6 +376,15 @@ class Ui_MainWindow(object):
             self.mediaplayer.play()
             #print("Play")
             self.pushButton.setText("Pause")
+
+    def position_changed(self,position):
+        self.horizontalSlider.setValue(position)
+
+    def duration_changed(self,duration):
+        self.horizontalSlider.setRange(0,duration)
+
+    def set_position(self, position):
+        self.mediaplayer.setPosition(position)
 
 
     def file_btn_clicked (self):
