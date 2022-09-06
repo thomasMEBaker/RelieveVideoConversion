@@ -7,7 +7,17 @@
 #functions to use - ffmpeg.trim
 #custom filters
 
-# look at multithreading to not hold onto process
+#To Do
+# - Multithreading
+# - end of media file to change play/pause
+# - get rid of old media file if changed
+# = Reposition 4k/6k
+# - Tidy code
+# - Version Number
+# - possible option to trim
+# - change bitrate
+# pyinstaller test
+# full installation test
 
 import sys
 import ffmpeg
@@ -25,6 +35,8 @@ from PyQt5.QtCore import QUrl
 radiobtn_4 = False
 radiobtn_6 = False
 radiobtn_both = False
+
+play = False
 
 fileLocation = ""
 saveLocation = ""
@@ -303,6 +315,9 @@ class Ui_MainWindow(object):
         self.mediaplayer.durationChanged.connect(self.duration_changed)
         self.horizontalSlider.sliderMoved.connect(self.set_position)
 
+        self.mediaplayer.positionChanged.connect(self.end_media)
+        
+
         self.mediaplayer.positionChanged.connect(self.print_position)
         
         self.retranslateUi(MainWindow)
@@ -327,8 +342,6 @@ class Ui_MainWindow(object):
         self.pushButton.clicked.connect(lambda: self.playVideo())
 
         
-        
-
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -372,18 +385,25 @@ class Ui_MainWindow(object):
             radiobtn_4 = False
 
     def playVideo(self):
+        global play
         if self.mediaplayer.state() == QMediaPlayer.PlayingState:
             self.mediaplayer.pause()
+            play = True
             #print("Pause")
             self.pushButton.setText("Play")
+        
         else:
             self.mediaplayer.play()
             #print("Play")
             self.pushButton.setText("Pause")
 
+    def media_end(self):
+            if self.mediaplayer.state() == QMediaPlayer.EndOfMedia:
+                print("end of media")
+
     def position_changed(self,position):
         self.horizontalSlider.setValue(position)
-
+        
     def duration_changed(self,duration):
         self.horizontalSlider.setRange(0,duration)
 
@@ -399,12 +419,15 @@ class Ui_MainWindow(object):
         minutes = int(minutes) 
         self.label.setText(str(minutes)+":"+str(seconds)+":"+str(millis-seconds))
 
+    def end_media(self,status):
+        if self.mediaplayer.state() == QMediaPlayer.EndOfMedia:
+            print("Bingo")
+
     
     def file_btn_clicked (self):
         global fileLocation
         fileList = QFileDialog.getOpenFileNames(None, "Select Directory","D:\\")
-        if fileList[0] !='':
-            print(fileList[0]) 
+        if str(fileList[0]) !='[]':
             fileLocation = str(fileList[0])
             final_location = fileLocation.replace('[','').replace(']','')
             final_location  = "file:"+final_location[1:-1]
@@ -412,9 +435,11 @@ class Ui_MainWindow(object):
             self.videoInformation(fileLocation)
             self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(str(fileLocation))))
             self.pushButton.setEnabled(True)
-            #test to make the video display
-            self.mediaplayer.play()
-            self.mediaplayer.pause()
+    
+            #self.mediaplayer.play()
+            #self.mediaplayer.pause()
+        else:
+            self.pushButton.setEnabled(False)
 
 
     def location_btn_clicked(self):
