@@ -134,7 +134,19 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.VideoDisplay.sizePolicy().hasHeightForWidth())
         self.VideoDisplay.setSizePolicy(sizePolicy)
         self.VideoDisplay.setMinimumSize(QtCore.QSize(400, 200))
+        self.VideoDisplay.setMaximumSize(QtCore.QSize(400, 200))
         self.VideoDisplay.setObjectName("VideoDisplay")
+        self.NoVideoWarning = QtWidgets.QLabel(self.VideoDisplay)
+        self.NoVideoWarning.setGeometry(QtCore.QRect(10, 10, 380, 180))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.NoVideoWarning.sizePolicy().hasHeightForWidth())
+        self.NoVideoWarning.setSizePolicy(sizePolicy)
+        self.NoVideoWarning.setMinimumSize(QtCore.QSize(350, 180))
+        self.NoVideoWarning.setMaximumSize(QtCore.QSize(400, 200))
+        self.NoVideoWarning.setAlignment(QtCore.Qt.AlignCenter)
+        self.NoVideoWarning.setObjectName("NoVideoWarning")
         self.verticalLayout_3.addWidget(self.VideoDisplay, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout.addLayout(self.verticalLayout_3)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
@@ -303,6 +315,8 @@ class Ui_MainWindow(object):
         self.Radio_Both.clicked.connect(lambda: self.radio_check())
 
         #push button/play needs updating
+        self.pushButton.setText("Play")
+        self.pushButton.setEnabled(False)
         self.pushButton.clicked.connect(lambda: self.playVideo())
         
 
@@ -310,6 +324,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.TitleLabel.setText(_translate("MainWindow", "ROVR Relieve - Video Conversion Tool"))
+        self.NoVideoWarning.setText(_translate("MainWindow", "No Video Selected"))
         self.pushButton.setText(_translate("MainWindow", "PushButton"))
         self.label.setText(_translate("MainWindow", "TextLabel"))
         self.FileBtn.setText(_translate("MainWindow", "Open File"))
@@ -351,9 +366,11 @@ class Ui_MainWindow(object):
         if self.mediaplayer.state() == QMediaPlayer.PlayingState:
             self.mediaplayer.pause()
             #print("Pause")
+            self.pushButton.setText("Play")
         else:
             self.mediaplayer.play()
             #print("Play")
+            self.pushButton.setText("Pause")
 
 
     def file_btn_clicked (self):
@@ -367,6 +384,7 @@ class Ui_MainWindow(object):
             fileLocation = final_location
             self.videoInformation(fileLocation)
             self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(str(fileLocation))))
+            self.pushButton.setEnabled(True)
 
 
     def location_btn_clicked(self):
