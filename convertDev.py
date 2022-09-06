@@ -5,7 +5,6 @@
 #pyuic5 -x testGUI.ui -o test.py
 
 #functions to use - ffmpeg.trim
-# generate thumbnail on github
 #custom filters
 
 # look at multithreading to not hold onto process
@@ -18,8 +17,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
 from PyQt5.uic import loadUi
 
-#include <QPixmap>
-
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtGui import QIcon, QPalette
+from PyQt5.QtCore import QUrl
 
 radiobtn_4 = False
 radiobtn_6 = False
@@ -38,7 +39,6 @@ def show_exception_and_exit(exc_type, exc_value, tb):
     input("Press key to exit.")
     sys.exit(-1)
 
-
 def generate_thumbnail(fname):
     (
     ffmpeg
@@ -48,8 +48,6 @@ def generate_thumbnail(fname):
     .run()
     )
     
-
-
 def convertion4k(fname):
     #resoltuion at 4096/2048
     stream = ffmpeg.input(fname)
@@ -127,15 +125,31 @@ class Ui_MainWindow(object):
         self.TitleLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.TitleLabel.setObjectName("TitleLabel")
         self.verticalLayout.addWidget(self.TitleLabel)
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.VideoDisplay = QVideoWidget(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoDisplay.sizePolicy().hasHeightForWidth())
+        self.VideoDisplay.setSizePolicy(sizePolicy)
+        self.VideoDisplay.setMinimumSize(QtCore.QSize(400, 200))
+        self.VideoDisplay.setObjectName("VideoDisplay")
+        self.verticalLayout_3.addWidget(self.VideoDisplay, 0, QtCore.Qt.AlignHCenter)
+        self.verticalLayout.addLayout(self.verticalLayout_3)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setObjectName("pushButton")
+        self.horizontalLayout_4.addWidget(self.pushButton)
+        self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
+        self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalLayout_4.addWidget(self.horizontalSlider)
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setMinimumSize(QtCore.QSize(100, 250))
-        font = QtGui.QFont()
-        font.setPointSize(19)
-        self.label.setFont(font)
-        self.label.setAutoFillBackground(False)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
-        self.verticalLayout.addWidget(self.label)
+        self.horizontalLayout_4.addWidget(self.label)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
         self.FileBtn = QtWidgets.QPushButton(self.centralwidget)
         self.FileBtn.setObjectName("FileBtn")
         self.verticalLayout.addWidget(self.FileBtn)
@@ -214,13 +228,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.Radio_4K = QtWidgets.QRadioButton(self.centralwidget)
         self.Radio_4K.setObjectName("Radio_4K")
-        self.verticalLayout_2.addWidget(self.Radio_4K)
+        self.verticalLayout_2.addWidget(self.Radio_4K, 0, QtCore.Qt.AlignHCenter)
         self.Radio_Both = QtWidgets.QRadioButton(self.centralwidget)
         self.Radio_Both.setObjectName("Radio_Both")
-        self.verticalLayout_2.addWidget(self.Radio_Both)
+        self.verticalLayout_2.addWidget(self.Radio_Both, 0, QtCore.Qt.AlignHCenter)
         self.Radio_6K = QtWidgets.QRadioButton(self.centralwidget)
         self.Radio_6K.setObjectName("Radio_6K")
-        self.verticalLayout_2.addWidget(self.Radio_6K)
+        self.verticalLayout_2.addWidget(self.Radio_6K, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout.addLayout(self.verticalLayout_2)
         self.AdvancedSettingsLabel = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
@@ -268,29 +282,36 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
+        self.mediaplayer = QMediaPlayer(None,QMediaPlayer.VideoSurface)
+        
+        self.mediaplayer.setVideoOutput(self.VideoDisplay)
+        
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        
+
         #open file button
         self.FileBtn.clicked.connect(lambda: self.file_btn_clicked())
 
         #save location button
         self.SaveLocationButton.clicked.connect(lambda: self.location_btn_clicked())
 
-        
         #convert files button
         self.ConvertBtn.clicked.connect(lambda: self.convert_btn_clicked())
         
         self.Radio_4K.clicked.connect(lambda: self.radio_check())
         self.Radio_6K.clicked.connect(lambda: self.radio_check())
         self.Radio_Both.clicked.connect(lambda: self.radio_check())
+
+        #push button/play needs updating
+        self.pushButton.clicked.connect(lambda: self.playVideo())
         
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.TitleLabel.setText(_translate("MainWindow", "ROVR Relieve - Video Conversion Tool"))
-        self.label.setText(_translate("MainWindow", "No Video Image"))
+        self.pushButton.setText(_translate("MainWindow", "PushButton"))
+        self.label.setText(_translate("MainWindow", "TextLabel"))
         self.FileBtn.setText(_translate("MainWindow", "Open File"))
         self.VideoOutputLabel_2.setText(_translate("MainWindow", "Current Video Information"))
         self.VideoNameLabel.setText(_translate("MainWindow", "Video Name :"))
@@ -325,29 +346,32 @@ class Ui_MainWindow(object):
             radiobtn_both = True
             radiobtn_6 = False
             radiobtn_4 = False
-        
+
+    def playVideo(self):
+        if self.mediaplayer.state() == QMediaPlayer.PlayingState:
+            self.mediaplayer.pause()
+            #print("Pause")
+        else:
+            self.mediaplayer.play()
+            #print("Play")
+
+
     def file_btn_clicked (self):
-        #need to look at the cancel error
         global fileLocation
         fileList = QFileDialog.getOpenFileNames(None, "Select Directory","D:\\")
-        fileLocation = str(fileList[0])
-        final_location = fileLocation.replace('[','').replace(']','')
-        final_location  = "file:"+final_location[1:-1]
-        fileLocation = final_location
-        self.videoInformation(fileLocation)
-        generate_thumbnail(fileLocation)
+        if fileList[0] !='':
+            print(fileList[0]) 
+            fileLocation = str(fileList[0])
+            final_location = fileLocation.replace('[','').replace(']','')
+            final_location  = "file:"+final_location[1:-1]
+            fileLocation = final_location
+            self.videoInformation(fileLocation)
+            self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(str(fileLocation))))
 
-        #FIRST THING SORT THE IMAGES
-
-
-        #pic.setPixmap(QtGui.QPixmap(os.getcwd() + "/logo.png"))
-
-  
 
     def location_btn_clicked(self):
         global saveLocation
-        directoryPath=QFileDialog.getExistingDirectory(None, "Get Any File");
-        #print(directoryPath);
+        directoryPath=QFileDialog.getExistingDirectory(self, "Get Any File");
         final_save_location = "file:"+directoryPath
         saveLocation = final_save_location
         print(saveLocation);
