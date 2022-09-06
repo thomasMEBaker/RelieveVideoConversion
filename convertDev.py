@@ -302,6 +302,8 @@ class Ui_MainWindow(object):
         self.mediaplayer.positionChanged.connect(self.position_changed)
         self.mediaplayer.durationChanged.connect(self.duration_changed)
         self.horizontalSlider.sliderMoved.connect(self.set_position)
+
+        self.mediaplayer.positionChanged.connect(self.print_position)
         
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -323,6 +325,8 @@ class Ui_MainWindow(object):
         self.pushButton.setText("Play")
         self.pushButton.setEnabled(False)
         self.pushButton.clicked.connect(lambda: self.playVideo())
+
+        
         
 
     def retranslateUi(self, MainWindow):
@@ -386,7 +390,16 @@ class Ui_MainWindow(object):
     def set_position(self, position):
         self.mediaplayer.setPosition(position)
 
+    def print_position(self,position):
 
+        millis = int(position)
+        seconds=(millis/1000)%60
+        seconds = int(seconds)
+        minutes=(millis/(1000*60))%60
+        minutes = int(minutes) 
+        self.label.setText(str(minutes)+":"+str(seconds)+":"+str(millis-seconds))
+
+    
     def file_btn_clicked (self):
         global fileLocation
         fileList = QFileDialog.getOpenFileNames(None, "Select Directory","D:\\")
@@ -399,6 +412,9 @@ class Ui_MainWindow(object):
             self.videoInformation(fileLocation)
             self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(str(fileLocation))))
             self.pushButton.setEnabled(True)
+            #test to make the video display
+            self.mediaplayer.play()
+            self.mediaplayer.pause()
 
 
     def location_btn_clicked(self):
