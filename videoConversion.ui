@@ -275,6 +275,13 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item alignment="Qt::AlignHCenter">
+       <widget class="QRadioButton" name="Radio_6K">
+        <property name="text">
+         <string>6K Video</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QRadioButton" name="Radio_4K">
         <property name="text">
          <string>4K Video</string>
@@ -285,13 +292,6 @@
        <widget class="QRadioButton" name="Radio_Both">
         <property name="text">
          <string>Both</string>
-        </property>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignHCenter">
-       <widget class="QRadioButton" name="Radio_6K">
-        <property name="text">
-         <string>6K Video</string>
         </property>
        </widget>
       </item>

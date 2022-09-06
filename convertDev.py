@@ -8,10 +8,9 @@
 #custom filters
 
 #To Do
-# - Multithreading
+# - Multiprocess or sub process?
 # - end of media file to change play/pause
 # - get rid of old media file if changed
-# = Reposition 4k/6k
 # - Tidy code
 # - Version Number
 # - possible option to trim
@@ -22,6 +21,8 @@
 import sys
 import ffmpeg
 import os
+from multiprocessing import Process, Queue
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
@@ -250,15 +251,15 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.VideoOutputLabel)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.Radio_6K = QtWidgets.QRadioButton(self.centralwidget)
+        self.Radio_6K.setObjectName("Radio_6K")
+        self.verticalLayout_2.addWidget(self.Radio_6K, 0, QtCore.Qt.AlignHCenter)
         self.Radio_4K = QtWidgets.QRadioButton(self.centralwidget)
         self.Radio_4K.setObjectName("Radio_4K")
         self.verticalLayout_2.addWidget(self.Radio_4K, 0, QtCore.Qt.AlignHCenter)
         self.Radio_Both = QtWidgets.QRadioButton(self.centralwidget)
         self.Radio_Both.setObjectName("Radio_Both")
         self.verticalLayout_2.addWidget(self.Radio_Both, 0, QtCore.Qt.AlignHCenter)
-        self.Radio_6K = QtWidgets.QRadioButton(self.centralwidget)
-        self.Radio_6K.setObjectName("Radio_6K")
-        self.verticalLayout_2.addWidget(self.Radio_6K, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout.addLayout(self.verticalLayout_2)
         self.AdvancedSettingsLabel = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
@@ -358,9 +359,9 @@ class Ui_MainWindow(object):
         self.VideoWidthInput.setText(_translate("MainWindow", "n/a"))
         self.VideoHeightInput.setText(_translate("MainWindow", "n/a"))
         self.VideoOutputLabel.setText(_translate("MainWindow", "Video Output Settings"))
+        self.Radio_6K.setText(_translate("MainWindow", "6K Video"))
         self.Radio_4K.setText(_translate("MainWindow", "4K Video"))
         self.Radio_Both.setText(_translate("MainWindow", "Both"))
-        self.Radio_6K.setText(_translate("MainWindow", "6K Video"))
         self.AdvancedSettingsLabel.setText(_translate("MainWindow", "Advanced Settings"))
         self.BitrateLabel.setText(_translate("MainWindow", "Bitrate"))
         self.SaveLocation.setText(_translate("MainWindow", "N/A"))
@@ -436,15 +437,15 @@ class Ui_MainWindow(object):
             self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(str(fileLocation))))
             self.pushButton.setEnabled(True)
     
-            #self.mediaplayer.play()
-            #self.mediaplayer.pause()
+            self.mediaplayer.play()
+            self.mediaplayer.pause()
         else:
             self.pushButton.setEnabled(False)
 
 
     def location_btn_clicked(self):
         global saveLocation
-        directoryPath=QFileDialog.getExistingDirectory(self, "Get Any File");
+        directoryPath=QFileDialog.getExistingDirectory(None, "Get Any File");
         final_save_location = "file:"+directoryPath
         saveLocation = final_save_location
         print(saveLocation);
@@ -499,10 +500,25 @@ class Ui_MainWindow(object):
             
 if __name__ == "__main__":
     sys.excepthook = show_exception_and_exit
-    add_path_variable()
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+    queue = Queue()
+    p = Process(target=add_path_variable(), args=(queue, 1))
+    p.start()
+    p.join()
+    #result = queue.get()
+
+    
+    """
+ 
+    p.join() # this blocks until the process terminates
+    result = queue.get()
+    print result
+
+    """
+    
+    #add_path_variable()
+    #app = QtWidgets.QApplication(sys.argv)
+    #MainWindow = QtWidgets.QMainWindow()
+    #ui = Ui_MainWindow()
+    #ui.setupUi(MainWindow)
+    #MainWindow.show()
+    #sys.exit(app.exec_())
