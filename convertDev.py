@@ -10,11 +10,12 @@
 #To Do
 # - Multiprocess or sub process?
 # - end of media file to change play/pause
-# - get rid of old media file if changed
-# - Tidy code
-# - Version Number
 # - possible option to trim
-# - change bitrate
+# - change to custom bitrate
+# - minutes seconds formatting
+
+#Testing
+# Tidy code
 # pyinstaller test
 # full installation test
 
@@ -31,6 +32,8 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtGui import QIcon, QPalette
 from PyQt5.QtCore import QUrl
+
+software_version = "Version 0.1"
 
 radiobtn_4 = False
 radiobtn_6 = False
@@ -214,24 +217,24 @@ class Ui_MainWindow(object):
         self.VideoNameInput = QtWidgets.QLabel(self.centralwidget)
         self.VideoNameInput.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+        font.setBold(False)
+        font.setWeight(50)
         self.VideoNameInput.setFont(font)
         self.VideoNameInput.setAlignment(QtCore.Qt.AlignCenter)
         self.VideoNameInput.setObjectName("VideoNameInput")
         self.horizontalLayout_2.addWidget(self.VideoNameInput)
         self.VideoWidthInput = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+        font.setBold(False)
+        font.setWeight(50)
         self.VideoWidthInput.setFont(font)
         self.VideoWidthInput.setAlignment(QtCore.Qt.AlignCenter)
         self.VideoWidthInput.setObjectName("VideoWidthInput")
         self.horizontalLayout_2.addWidget(self.VideoWidthInput)
         self.VideoHeightInput = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+        font.setBold(False)
+        font.setWeight(50)
         self.VideoHeightInput.setFont(font)
         self.VideoHeightInput.setAlignment(QtCore.Qt.AlignCenter)
         self.VideoHeightInput.setObjectName("VideoHeightInput")
@@ -294,9 +297,15 @@ class Ui_MainWindow(object):
         self.ConvertBtn.setFont(font)
         self.ConvertBtn.setObjectName("ConvertBtn")
         self.verticalLayout.addWidget(self.ConvertBtn)
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.versionLabel = QtWidgets.QLabel(self.centralwidget)
+        self.versionLabel.setObjectName("versionLabel")
+        self.verticalLayout_4.addWidget(self.versionLabel, 0, QtCore.Qt.AlignHCenter)
+        self.verticalLayout.addLayout(self.verticalLayout_4)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 908, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 908, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -343,11 +352,14 @@ class Ui_MainWindow(object):
         self.label.setEnabled(False)
         self.horizontalSlider.setEnabled(False)
 
+        #version number
+        self.versionLabel.setText(str(software_version))
+
         
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.TitleLabel.setText(_translate("MainWindow", "ROVR Relieve - Video Conversion Tool"))
+        self.TitleLabel.setText(_translate("MainWindow", "ROVR Relieve - Video Conversion Tool (Beta)"))
         self.NoVideoWarning.setText(_translate("MainWindow", "No Video Selected"))
         self.pushButton.setText(_translate("MainWindow", "PushButton"))
         self.label.setText(_translate("MainWindow", "TextLabel"))
@@ -368,6 +380,7 @@ class Ui_MainWindow(object):
         self.SaveLocation.setText(_translate("MainWindow", "N/A"))
         self.SaveLocationButton.setText(_translate("MainWindow", "Save Location"))
         self.ConvertBtn.setText(_translate("MainWindow", "Convert File(s)"))
+        self.versionLabel.setText(_translate("MainWindow", "V1.0"))
 
     def radio_check(self):
         global radiobtn_4
