@@ -8,7 +8,7 @@
 #custom filters
 
 #To Do
-# - Multiprocess or sub process?
+# - Qthread - https://realpython.com/python-pyqt-qthread/
 # - end of media file to change play/pause
 # - possible option to trim
 # - change to custom bitrate
@@ -22,7 +22,7 @@
 import sys
 import ffmpeg
 import os
-from multiprocessing import Process, Queue
+from threading import Thread
 #PY QT imports
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -426,13 +426,22 @@ class Ui_MainWindow(object):
         self.mediaplayer.setPosition(position)
 
     def print_position(self,position):
+        seconds=(position/1000.0)
+        RemainingSec = seconds % (24 * 3600)
+        HoursGet = RemainingSec // 3600
+        RemainingSec %= 3600
+        MinutesGet = RemainingSec // 60
+        self.label.setText(str(int(MinutesGet)) + ":" + str(int(seconds%60)))
 
-        millis = int(position)
-        seconds=(millis/1000)%60
-        seconds = int(seconds)
-        minutes=(millis/(1000*60))%60
-        minutes = int(minutes) 
-        self.label.setText(str(minutes)+":"+str(seconds)+":"+str(millis))
+
+        
+
+        #millis = int(position)
+        #seconds=(millis/1000)%60
+        #seconds = int(seconds)
+        #minutes=(millis/(1000*60))%60
+        #minutes = int(minutes) 
+        #self.label.setText(str(minutes)+":"+str(seconds)+":"+str(millis))
 
     def end_media(self,status):
         if self.mediaplayer.state() == QMediaPlayer.EndOfMedia:
@@ -514,24 +523,12 @@ class Ui_MainWindow(object):
     
         path = os.environ.get('PATH')
         print(path)
-            
+
+
+ 
+        
 if __name__ == "__main__":
     sys.excepthook = show_exception_and_exit
-    #queue = Queue()
-    #p = Process(target=add_path_variable(), args=(queue, 1))
-    #p.start()
-    #p.join()
-    #result = queue.get()
-
-    
-    """
- 
-    p.join() # this blocks until the process terminates
-    result = queue.get()
-    print result
-
-    """
-    
     add_path_variable()
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
