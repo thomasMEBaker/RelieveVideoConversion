@@ -8,10 +8,11 @@
 #custom filters
 
 #To Do
+# - Qthread - https://realpython.com/python-pyqt-qthread/
 # - end of media file to change play/pause
 # - possible option to trim length of video
 # - change to custom bitrate
-#folder index for Relieve - HMD and Tablet folders
+# fixed main window size to stop over expanding
 
 #Testing
 # Tidy code
@@ -21,9 +22,7 @@
 import sys
 import ffmpeg
 import os
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
-from PyQt5.QtWidgets import QMessageBox
-
+from threading import Thread
 #PY QT imports
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -40,13 +39,11 @@ radiobtn_4 = False
 radiobtn_6 = False
 radiobtn_both = False
 play = False
-fileSelected = False
 fileLocation = ""
 saveLocation = ""
 videoName = ""
 videoWidth = ""
 videoHeight = ""
-
 
 def show_exception_and_exit(exc_type, exc_value, tb):
     import traceback
@@ -121,14 +118,12 @@ def add_path_variable():
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(500, 678)
+        MainWindow.resize(908, 800)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QtCore.QSize(500, 678))
-        MainWindow.setMaximumSize(QtCore.QSize(500, 678))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -285,8 +280,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.BitrateInput.sizePolicy().hasHeightForWidth())
         self.BitrateInput.setSizePolicy(sizePolicy)
-        self.BitrateInput.setMinimumSize(QtCore.QSize(0, 25))
-        self.BitrateInput.setMaximumSize(QtCore.QSize(600, 25))
+        self.BitrateInput.setMaximumSize(QtCore.QSize(600, 50))
         self.BitrateInput.setObjectName("BitrateInput")
         self.horizontalLayout_3.addWidget(self.BitrateInput)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
@@ -311,7 +305,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.verticalLayout_4)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 500, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 908, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -439,6 +433,16 @@ class Ui_MainWindow(object):
         MinutesGet = RemainingSec // 60
         self.label.setText(str(int(MinutesGet)) + ":" + str(int(seconds%60)))
 
+
+        
+
+        #millis = int(position)
+        #seconds=(millis/1000)%60
+        #seconds = int(seconds)
+        #minutes=(millis/(1000*60))%60
+        #minutes = int(minutes) 
+        #self.label.setText(str(minutes)+":"+str(seconds)+":"+str(millis))
+
     def end_media(self,status):
         if self.mediaplayer.state() == QMediaPlayer.EndOfMedia:
             print("Bingo")
@@ -446,7 +450,6 @@ class Ui_MainWindow(object):
     
     def file_btn_clicked (self):
         global fileLocation
-        global fileSelected
         fileList = QFileDialog.getOpenFileNames(None, "Select Directory","D:\\")
         if str(fileList[0]) !='[]':
             fileLocation = str(fileList[0])
@@ -461,7 +464,6 @@ class Ui_MainWindow(object):
     
             self.mediaplayer.play()
             self.mediaplayer.pause()
-            fileSelected = True
         else:
             self.pushButton.setEnabled(False)
             self.pushButton.setEnabled(False)
@@ -469,7 +471,8 @@ class Ui_MainWindow(object):
             self.label.setEnabled(False)
             self.mediaplayer.setMedia(QMediaContent())
             print("Cancel")
-            fileSelected = False
+
+
 
     def location_btn_clicked(self):
         global saveLocation
@@ -497,29 +500,14 @@ class Ui_MainWindow(object):
         self.VideoHeightInput.setText(str(height))
             
 
-    def convert_btn_clicked (self):
-        print(radiobtn_4)
-        print(radiobtn_6)
-        print(radiobtn_both)
-        if fileSelected != True:
-            self.pop_up_UI(" ","Plesae select a file to convert.")
-
-        elif radiobtn_4 == True or radiobtn_6 == True or radiobtn_both == True:
-            self.worker = WorkerThread()
-            self.worker.start()
-            MainWindow.setEnabled(False)
-            self.worker.finished.connect(self.evt_worker_finished)
-        else:
-            self.pop_up_UI(" ","Plesae select a video output resolution.")
-
-    def evt_worker_finished(self):
-        #this will indicate that the video conversion is complete and the loading screen can be removed 
-        print("Worker Thread Complete")
-        MainWindow.setEnabled(True)
-
-        #UI pop up to say the video has been converted
-        self.pop_up_UI("Success!","The video was converted successfully.")
-        
+    def convert_btn_clicked (self):        
+        if (radiobtn_4 == True):
+            convertion4k(fileLocation)
+        elif (radiobtn_6 == True):
+            convertion6k(fileLocation)
+        elif (radiobtn_both == True):
+            convertion4k(fileLocation)
+            convertion6k(fileLocation)
 
     def add_path_variable():
         if sys.platform == 'win32':
@@ -535,23 +523,6 @@ class Ui_MainWindow(object):
     
         path = os.environ.get('PATH')
         print(path)
-
-    def pop_up_UI(self,titleText,bodyText):
-        msg = QMessageBox()
-        msg.setWindowTitle(titleText)
-        msg.setText(bodyText)
-        x = msg.exec_()
-        
-
-class WorkerThread(QThread):
-    def run (self):
-        if (radiobtn_4 == True):
-            convertion4k(fileLocation)
-        elif (radiobtn_6 == True):
-            convertion6k(fileLocation)
-        elif (radiobtn_both == True):
-            convertion4k(fileLocation)
-            convertion6k(fileLocation)
 
 if __name__ == "__main__":
     sys.excepthook = show_exception_and_exit
