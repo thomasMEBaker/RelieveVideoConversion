@@ -22,12 +22,11 @@ import sys
 import ffmpeg
 import os
 from multiprocessing import Process, Queue
-
+#PY QT imports
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
 from PyQt5.uic import loadUi
-
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtGui import QIcon, QPalette
@@ -36,15 +35,12 @@ from PyQt5.QtCore import QUrl
 radiobtn_4 = False
 radiobtn_6 = False
 radiobtn_both = False
-
 play = False
-
 fileLocation = ""
 saveLocation = ""
 videoName = ""
 videoWidth = ""
 videoHeight = ""
-
 
 def show_exception_and_exit(exc_type, exc_value, tb):
     import traceback
@@ -71,7 +67,7 @@ def convertion4k(fname):
     name = filename_split[name_size]
     stream = ffmpeg.output(stream, saveLocation+"/"+name+'4K_Tablet.mp4')
     ffmpeg.run(stream)
-    print("4K Conversion Complete!")
+    #print("4K Conversion Complete!")
 
 def convertion6k(fname):
     #resoltuion at 5760/2880
@@ -83,7 +79,7 @@ def convertion6k(fname):
     name = filename_split[name_size]
     stream = ffmpeg.output(stream, saveLocation+"/"+name+'6K_Headset.mp4')
     ffmpeg.run(stream)
-    print("6K Conversion Complete!")
+    #print("6K Conversion Complete!")
 
 def cropInputFile(fname):
     #not currently implemented! 
@@ -500,10 +496,10 @@ class Ui_MainWindow(object):
             
 if __name__ == "__main__":
     sys.excepthook = show_exception_and_exit
-    queue = Queue()
-    p = Process(target=add_path_variable(), args=(queue, 1))
-    p.start()
-    p.join()
+    #queue = Queue()
+    #p = Process(target=add_path_variable(), args=(queue, 1))
+    #p.start()
+    #p.join()
     #result = queue.get()
 
     
@@ -515,10 +511,10 @@ if __name__ == "__main__":
 
     """
     
-    #add_path_variable()
-    #app = QtWidgets.QApplication(sys.argv)
-    #MainWindow = QtWidgets.QMainWindow()
-    #ui = Ui_MainWindow()
-    #ui.setupUi(MainWindow)
-    #MainWindow.show()
-    #sys.exit(app.exec_())
+    add_path_variable()
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
