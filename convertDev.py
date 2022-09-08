@@ -338,6 +338,11 @@ class Ui_MainWindow(object):
         self.pushButton.setEnabled(False)
         self.pushButton.clicked.connect(lambda: self.playVideo())
 
+        #needs formatting to minutes and seconds etc
+        self.label.setText("0:0:0")
+        self.label.setEnabled(False)
+        self.horizontalSlider.setEnabled(False)
+
         
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -414,7 +419,7 @@ class Ui_MainWindow(object):
         seconds = int(seconds)
         minutes=(millis/(1000*60))%60
         minutes = int(minutes) 
-        self.label.setText(str(minutes)+":"+str(seconds)+":"+str(millis-seconds))
+        self.label.setText(str(minutes)+":"+str(seconds)+":"+str(millis))
 
     def end_media(self,status):
         if self.mediaplayer.state() == QMediaPlayer.EndOfMedia:
@@ -432,11 +437,19 @@ class Ui_MainWindow(object):
             self.videoInformation(fileLocation)
             self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(str(fileLocation))))
             self.pushButton.setEnabled(True)
+            self.horizontalSlider.setEnabled(True)
+            self.label.setEnabled(True)
     
             self.mediaplayer.play()
             self.mediaplayer.pause()
         else:
             self.pushButton.setEnabled(False)
+            self.pushButton.setEnabled(False)
+            self.horizontalSlider.setEnabled(False)
+            self.label.setEnabled(False)
+            self.mediaplayer.setMedia(QMediaContent())
+            print("Cancel")
+
 
 
     def location_btn_clicked(self):
@@ -455,15 +468,10 @@ class Ui_MainWindow(object):
         width = int(video_stream['width'])
         height = int(video_stream['height'])
 
-        #print("Video Name - "+str(fname))
-        #print("Video Width - "+str(width))
-        #print("Video Height - "+str(height))
-        #print("                           ")
         file_index = len(fname.split('/')) - 1
         filename_short = fname.split('/')
         filename_short = filename_short[file_index]
-            
-        #print(filename_short)
+        
 
         self.VideoNameInput.setText(str(filename_short))
         self.VideoWidthInput.setText(str(width))
