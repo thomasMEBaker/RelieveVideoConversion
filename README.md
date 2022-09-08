@@ -1,5 +1,7 @@
 # RelieveVideoConversion
 
+This program requires K-lite video codec, install this here - http://www.codecguide.com/download_kl.htm
+
 Go to your program’s directory and run:
 
 pyinstaller yourprogram.py
