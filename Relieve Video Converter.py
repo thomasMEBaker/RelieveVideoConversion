@@ -14,6 +14,9 @@
 # pyinstaller test
 # full installation test
 
+#useful - https://github.com/kkroening/ffmpeg-python/issues/155
+#https://github.com/kkroening/ffmpeg-python/issues/184
+
 import sys
 import ffmpeg
 import os
@@ -45,6 +48,7 @@ videoName = ""
 videoWidth = ""
 videoHeight = ""
 conversionComplete = False
+video_length = 0.0;
 
 
 def show_exception_and_exit(exc_type, exc_value, tb):
@@ -188,10 +192,16 @@ def convertion4k(fname):
         conversionComplete = False
     else:
         if directorySelected:
-            stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
+            #print (fname)
+            stream = ffmpeg.input(fname).filter('trim',start=33.3)
+            stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+'_trimmed.mp4')
+            #original - stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
             #print("saveLocation+"//Tablet//"+name+".mp4)
         else:
-            stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
+            #print (fname)
+            stream = ffmpeg.input(fname).filter('trim',start=33.3)
+            stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+'_trimmed.mp4')
+            #original - stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
             #print("here")
         ffmpeg.run(stream)
         conversionComplete = True
@@ -222,12 +232,11 @@ def convertion6k(fname):
 
 
 def cropInputFile(fname):
-    #not currently implemented! 
     #stream = ffmpeg.input(fname+'.mp4').filter('trim',duration=33.3) to just give an overall length
     #stream = ffmpeg.input(fname+'.mp4').filter('trim',start=33.3,end=50.0) #not 100% working
     #stream = ffmpeg.output(stream, fname+'_trimmed.mp4')
     #ffmpeg.run(stream)
-    print("6K Complete!")
+    print("Croppped Video")
 
 def module_exists(module_name):
     try:
@@ -256,7 +265,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(500, 678)
+        MainWindow.resize(605, 782)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -503,17 +512,9 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.AdvancedSettingsLabel, 0, QtCore.Qt.AlignHCenter)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.BitrateLabel = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.BitrateLabel.sizePolicy().hasHeightForWidth())
-        self.BitrateLabel.setSizePolicy(sizePolicy)
-        self.BitrateLabel.setMinimumSize(QtCore.QSize(240, 20))
-        self.BitrateLabel.setMaximumSize(QtCore.QSize(240, 20))
-        self.BitrateLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.BitrateLabel.setObjectName("BitrateLabel")
-        self.horizontalLayout_3.addWidget(self.BitrateLabel)
+        self.BitrateCheck = QtWidgets.QCheckBox(self.centralwidget)
+        self.BitrateCheck.setObjectName("BitrateCheck")
+        self.horizontalLayout_3.addWidget(self.BitrateCheck)
         self.BitrateInput = QtWidgets.QTextEdit(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -525,6 +526,33 @@ class Ui_MainWindow(object):
         self.BitrateInput.setObjectName("BitrateInput")
         self.horizontalLayout_3.addWidget(self.BitrateInput)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBox.setObjectName("checkBox")
+        self.horizontalLayout_5.addWidget(self.checkBox)
+        self.VideoStart = QtWidgets.QTextEdit(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoStart.sizePolicy().hasHeightForWidth())
+        self.VideoStart.setSizePolicy(sizePolicy)
+        self.VideoStart.setMaximumSize(QtCore.QSize(250, 25))
+        self.VideoStart.setObjectName("VideoStart")
+        self.horizontalLayout_5.addWidget(self.VideoStart)
+        self.VideoEnd = QtWidgets.QTextEdit(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoEnd.sizePolicy().hasHeightForWidth())
+        self.VideoEnd.setSizePolicy(sizePolicy)
+        self.VideoEnd.setMaximumSize(QtCore.QSize(16777215, 25))
+        self.VideoEnd.setObjectName("VideoEnd")
+        self.horizontalLayout_5.addWidget(self.VideoEnd)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+        self.verticalLayout.addLayout(self.verticalLayout_5)
         self.SaveLocation = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -535,7 +563,7 @@ class Ui_MainWindow(object):
         self.SaveLocation.setMaximumSize(QtCore.QSize(480, 20))
         self.SaveLocation.setAlignment(QtCore.Qt.AlignCenter)
         self.SaveLocation.setObjectName("SaveLocation")
-        self.verticalLayout.addWidget(self.SaveLocation)
+        self.verticalLayout.addWidget(self.SaveLocation, 0, QtCore.Qt.AlignHCenter)
         self.SaveLocationButton = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -574,7 +602,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.verticalLayout_4)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 500, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 605, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -624,7 +652,15 @@ class Ui_MainWindow(object):
         #version number
         self.versionLabel.setText(str(software_version))
 
-        
+        self.checkBox.clicked.connect(lambda: self.trim_check())
+        self.VideoStart.setEnabled(False)
+        self.VideoEnd.setEnabled(False)
+
+        self.checkBox.clicked.connect(lambda: self.trim_check())
+
+        self.BitrateCheck.clicked.connect(lambda: self.bitrate_check())
+        self.BitrateInput.setEnabled(False)
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -645,12 +681,38 @@ class Ui_MainWindow(object):
         self.Radio_4K.setText(_translate("MainWindow", "4K Video"))
         self.Radio_Both.setText(_translate("MainWindow", "Both"))
         self.AdvancedSettingsLabel.setText(_translate("MainWindow", "Advanced Settings"))
-        self.BitrateLabel.setText(_translate("MainWindow", "Bitrate"))
+        self.BitrateCheck.setText(_translate("MainWindow", "Bitrate"))
+        self.checkBox.setText(_translate("MainWindow", "Trim (Start/End)"))
         self.SaveLocation.setText(_translate("MainWindow", "N/A"))
         self.SaveLocationButton.setText(_translate("MainWindow", "Save Location"))
         self.ConvertBtn.setText(_translate("MainWindow", "Convert File(s)"))
         self.versionLabel.setText(_translate("MainWindow", "V1.0"))
 
+
+    def bitrate_check(self):
+        if self.BitrateCheck.isChecked():
+            self.BitrateInput.setEnabled(True)
+        else:
+            self.BitrateInput.setEnabled(False)
+
+
+    def trim_check(self):
+        if self.checkBox.isChecked():
+            self.VideoStart.setEnabled(True)
+            self.VideoEnd.setEnabled(True)
+    
+            RemainingSec = video_length % (24 * 3600)
+            HoursGet = RemainingSec // 3600
+            RemainingSec %= 3600
+            MinutesGet = RemainingSec // 60
+            self.VideoStart.setText("0:00")
+            self.VideoEnd.setText(str(int(MinutesGet)) + ":" + str(int(video_length%60)))
+        else:
+            self.VideoStart.setEnabled(False)
+            self.VideoEnd.setEnabled(False)
+            self.VideoStart.setText("")
+            self.VideoEnd.setText("")
+            
     def radio_check(self):
         global radiobtn_4
         global radiobtn_6
@@ -744,20 +806,22 @@ class Ui_MainWindow(object):
 
 
     def videoInformation(self,fname):
+        global video_length
         probe = ffmpeg.probe(fname)
         video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
         width = int(video_stream['width'])
         height = int(video_stream['height'])
+        video_length = float(video_stream['duration'])
+        
 
         file_index = len(fname.split('/')) - 1
         filename_short = fname.split('/')
         filename_short = filename_short[file_index]
-        
 
         self.VideoNameInput.setText(str(filename_short))
         self.VideoWidthInput.setText(str(width))
         self.VideoHeightInput.setText(str(height))
-            
+        
 
     def convert_btn_clicked (self):
         print(radiobtn_4)
