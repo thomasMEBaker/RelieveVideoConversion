@@ -1,17 +1,13 @@
 
-#using https://github.com/kkroening/ffmpeg-python
+# Written by Tom Baker - Sept 2022
+# Python 3.9.12 & QT5
+# using https://github.com/kkroening/ffmpeg-python
 # API refence https://kkroening.github.io/ffmpeg-python/
 
-#pyuic5 -x testGUI.ui -o test.py
-
-#functions to use - ffmpeg.trim
-#custom filters
-
 #To Do
-# - end of media file to change play/pause
-# - possible option to trim length of video
-# - change to custom bitrate
-#folder index for Relieve - HMD and Tablet folders
+#possible option to trim length of video
+#change to custom bitrate
+#sort layout on other computers e.g. laptop
 
 #Testing
 # Tidy code
@@ -36,6 +32,8 @@ from PyQt5.QtCore import QUrl
 
 software_version = "Version 0.1"
 
+directorySelected = False
+
 radiobtn_4 = False
 radiobtn_6 = False
 radiobtn_both = False
@@ -46,6 +44,7 @@ saveLocation = ""
 videoName = ""
 videoWidth = ""
 videoHeight = ""
+conversionComplete = False
 
 
 def show_exception_and_exit(exc_type, exc_value, tb):
@@ -62,30 +61,165 @@ def generate_thumbnail(fname):
     .output("tmp.jpg", vframes=1)
     .run()
     )
+
+def createFileStructure(parent_dir):
+    global directorySelected
+    main_directory = "RovrConvertedVideos"
+   # print(parent_dir)
+    x = parent_dir.split("/")
+   # print (x)
+   # print(len(x)-1)
+    if x[len(x)-1] == "RovrConvertedVideos":
+        #print ("directory clicked on already")
+        directorySelected = True
+    else:
+        #print ("directory not clicked on")
+        directorySelected = False
+
+    if (directorySelected == False):
+       # print("Directory not selected - checking if it needs to be made.")
+        if(os.path.isdir(parent_dir+"\\"+main_directory)!=True):
+           # print("Creating directory")
+            path = os.path.join(parent_dir, main_directory)
+            os.mkdir(path)
+            hmd_sub_directory = "Headset"
+            tablet_sub_directory = "Tablet"
+            path = os.path.join(parent_dir+"\\"+main_directory, hmd_sub_directory)
+            os.mkdir(path)
+            path = os.path.join(parent_dir+"\\"+main_directory, tablet_sub_directory)
+            os.mkdir(path)
+        else:
+           # print("No directory creation required")
+           # print("Checking sub Headset Folder")
+            if(os.path.isdir(parent_dir+"\\"+main_directory+"\\"+"Headset")!=True):
+                #print("Creating headset folder")
+                path = os.path.join(parent_dir+"\\"+main_directory,"Headset")
+                os.mkdir(path)
+            if(os.path.isdir(parent_dir+"\\"+main_directory+"\\"+"Tablet")!=True):
+                #print("Creating tablet folder")
+                
+                path = os.path.join(parent_dir+"\\"+main_directory,"Tablet")
+                os.mkdir(path) 
+
+    else:
+        #print("No directory creation required")
+        #print (parent_dir)
+        if(os.path.isdir(parent_dir+"\\"+"Headset")!=True):
+            #print("Creating headset folder")
+            path = os.path.join(parent_dir,"Headset")
+            os.mkdir(path)
+        if(os.path.isdir(parent_dir+"\\"+"Tablet")!=True):
+            #print("Creating tablet folder")
+            path = os.path.join(parent_dir,"Tablet")
+            os.mkdir(path)
+
+def checkfile(filename,location,fourSix):
+    global conversionComplete;
+    if fourSix !=True:
+        #print("Checking 4K Folder")
+        #print(location)
+        #print(filename)
+        if directorySelected==True:
+            #print("Directory selected")
+            if (os.path.isfile(location+"//Tablet//"+filename+".mp4")):
+                return False
+                conversionComplete = False
+                #print("File already there")
+            else:
+                return True
+                conversionComplete = True
+                #print("File going ahead")
+        else:
+            #print("Directory not selected")
+            
+            #print("Directory not selected")
+            if (os.path.isfile(location+"/RovrConvertedVideos/Tablet/"+filename+".mp4")):
+                return False
+                conversionComplete = False
+                #print("File already there")
+
+            else:
+                return True
+                conversionComplete = True
+                #print("File going ahead")
+
+    else:
+        #print("Checking 6k Folder")
+        #print(location)
+        #print(filename)
+        if directorySelected==True:
+            #print("Directory selected")
+            if (os.path.isfile(location+"//Headset//"+filename+".mp4")):
+                return False
+                conversionComplete = False
+                #print("File already there")
+            else:
+                return True
+                conversionComplete = True
+                #print("File going ahead")
+        else:
+            #print("Directory not selected")
+            
+            #print("Directory not selected")
+            if (os.path.isfile(location+"/RovrConvertedVideos/Headset/"+filename+".mp4")):
+                return False
+                conversionComplete = False
+                #print("File already there")
+
+            else:
+                return True
+                conversionComplete = True
+                #print("File going ahead")
+    
     
 def convertion4k(fname):
     #resoltuion at 4096/2048
+    global conversionComplete
+    createFileStructure(saveLocation)
     stream = ffmpeg.input(fname)
     stream = ffmpeg.filter(stream,"scale",4096,2048)
     mp4_removal = os.path.splitext(fname)[0]
     name_size = len(mp4_removal.split('/')) - 1
     filename_split = mp4_removal.split('/')
     name = filename_split[name_size]
-    stream = ffmpeg.output(stream, saveLocation+"/"+name+'4K_Tablet.mp4')
-    ffmpeg.run(stream)
-    #print("4K Conversion Complete!")
+    #print("Dir selected -" + str(directorySelected))
+    if checkfile(name,saveLocation,False) == False:
+        #print ("Checkfile returned False")
+        conversionComplete = False
+    else:
+        if directorySelected:
+            stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
+            #print("saveLocation+"//Tablet//"+name+".mp4)
+        else:
+            stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
+            #print("here")
+        ffmpeg.run(stream)
+        conversionComplete = True
 
 def convertion6k(fname):
     #resoltuion at 5760/2880
+    global conversionComplete
+    createFileStructure(saveLocation)
     stream = ffmpeg.input(fname)
     stream = ffmpeg.filter(stream,"scale",5760,2880)
     mp4_removal = os.path.splitext(fname)[0]
     name_size = len(mp4_removal.split('/')) - 1
     filename_split = mp4_removal.split('/')
     name = filename_split[name_size]
-    stream = ffmpeg.output(stream, saveLocation+"/"+name+'6K_Headset.mp4')
-    ffmpeg.run(stream)
-    #print("6K Conversion Complete!")
+    #print("Dir selected -" + str(directorySelected))
+    if checkfile(name,saveLocation,True) == False:
+            #print ("Checkfile returned False")
+            conversionComplete = False
+    else:
+        if directorySelected:
+            stream = ffmpeg.output(stream, saveLocation+"//Headset//"+name+".mp4")
+            #print("saveLocation+"//Tablet//"+name+".mp4)
+        else:
+            stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Headset/"+name+".mp4")
+            #print("here")
+        ffmpeg.run(stream)
+        conversionComplete = True
+
 
 def cropInputFile(fname):
     #not currently implemented! 
@@ -93,7 +227,7 @@ def cropInputFile(fname):
     #stream = ffmpeg.input(fname+'.mp4').filter('trim',start=33.3,end=50.0) #not 100% working
     #stream = ffmpeg.output(stream, fname+'_trimmed.mp4')
     #ffmpeg.run(stream)
-    print("6K Conversion Complete!")
+    print("6K Complete!")
 
 def module_exists(module_name):
     try:
@@ -111,29 +245,37 @@ def add_path_variable():
 
     directory = os.getcwd()
     directory = directory + "\FFmpeg\\bin"
-    print(directory)
+    #print(directory)
 
     os.environ['PATH'] += sep + directory
     
     path = os.environ.get('PATH')
-    print(path)
+    #print(path)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+        MainWindow.setEnabled(True)
         MainWindow.resize(500, 678)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QtCore.QSize(500, 678))
-        MainWindow.setMaximumSize(QtCore.QSize(500, 678))
+        MainWindow.setMaximumSize(QtCore.QSize(750, 1017))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.TitleLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.TitleLabel.sizePolicy().hasHeightForWidth())
+        self.TitleLabel.setSizePolicy(sizePolicy)
+        self.TitleLabel.setMinimumSize(QtCore.QSize(480, 20))
+        self.TitleLabel.setMaximumSize(QtCore.QSize(480, 20))
         font = QtGui.QFont()
         font.setPointSize(13)
         font.setBold(False)
@@ -141,7 +283,7 @@ class Ui_MainWindow(object):
         self.TitleLabel.setFont(font)
         self.TitleLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.TitleLabel.setObjectName("TitleLabel")
-        self.verticalLayout.addWidget(self.TitleLabel)
+        self.verticalLayout.addWidget(self.TitleLabel, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.VideoDisplay = QVideoWidget(self.centralwidget)
@@ -169,30 +311,47 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setMinimumSize(QtCore.QSize(0, 23))
+        self.pushButton.setMaximumSize(QtCore.QSize(16777215, 23))
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_4.addWidget(self.pushButton)
         self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
+        self.horizontalSlider.setMinimumSize(QtCore.QSize(0, 23))
+        self.horizontalSlider.setMaximumSize(QtCore.QSize(16777215, 23))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
         self.horizontalLayout_4.addWidget(self.horizontalSlider)
         self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setMinimumSize(QtCore.QSize(47, 23))
+        self.label.setMaximumSize(QtCore.QSize(47, 23))
         self.label.setObjectName("label")
         self.horizontalLayout_4.addWidget(self.label)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
         self.FileBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.FileBtn.setMinimumSize(QtCore.QSize(480, 25))
+        self.FileBtn.setMaximumSize(QtCore.QSize(480, 25))
         self.FileBtn.setObjectName("FileBtn")
-        self.verticalLayout.addWidget(self.FileBtn)
+        self.verticalLayout.addWidget(self.FileBtn, 0, QtCore.Qt.AlignHCenter)
         self.VideoOutputLabel_2 = QtWidgets.QLabel(self.centralwidget)
+        self.VideoOutputLabel_2.setMinimumSize(QtCore.QSize(480, 15))
+        self.VideoOutputLabel_2.setMaximumSize(QtCore.QSize(480, 15))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
         self.VideoOutputLabel_2.setFont(font)
         self.VideoOutputLabel_2.setAlignment(QtCore.Qt.AlignCenter)
         self.VideoOutputLabel_2.setObjectName("VideoOutputLabel_2")
-        self.verticalLayout.addWidget(self.VideoOutputLabel_2)
+        self.verticalLayout.addWidget(self.VideoOutputLabel_2, 0, QtCore.Qt.AlignHCenter)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.VideoNameLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoNameLabel.sizePolicy().hasHeightForWidth())
+        self.VideoNameLabel.setSizePolicy(sizePolicy)
+        self.VideoNameLabel.setMinimumSize(QtCore.QSize(160, 10))
+        self.VideoNameLabel.setMaximumSize(QtCore.QSize(160, 10))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -201,6 +360,13 @@ class Ui_MainWindow(object):
         self.VideoNameLabel.setObjectName("VideoNameLabel")
         self.horizontalLayout.addWidget(self.VideoNameLabel)
         self.VideoWidthLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoWidthLabel.sizePolicy().hasHeightForWidth())
+        self.VideoWidthLabel.setSizePolicy(sizePolicy)
+        self.VideoWidthLabel.setMinimumSize(QtCore.QSize(160, 10))
+        self.VideoWidthLabel.setMaximumSize(QtCore.QSize(160, 10))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -209,6 +375,13 @@ class Ui_MainWindow(object):
         self.VideoWidthLabel.setObjectName("VideoWidthLabel")
         self.horizontalLayout.addWidget(self.VideoWidthLabel)
         self.VideoHeightLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoHeightLabel.sizePolicy().hasHeightForWidth())
+        self.VideoHeightLabel.setSizePolicy(sizePolicy)
+        self.VideoHeightLabel.setMinimumSize(QtCore.QSize(160, 10))
+        self.VideoHeightLabel.setMaximumSize(QtCore.QSize(160, 10))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -220,7 +393,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.VideoNameInput = QtWidgets.QLabel(self.centralwidget)
-        self.VideoNameInput.setMinimumSize(QtCore.QSize(0, 0))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoNameInput.sizePolicy().hasHeightForWidth())
+        self.VideoNameInput.setSizePolicy(sizePolicy)
+        self.VideoNameInput.setMinimumSize(QtCore.QSize(160, 10))
+        self.VideoNameInput.setMaximumSize(QtCore.QSize(160, 10))
         font = QtGui.QFont()
         font.setBold(False)
         font.setWeight(50)
@@ -229,6 +408,13 @@ class Ui_MainWindow(object):
         self.VideoNameInput.setObjectName("VideoNameInput")
         self.horizontalLayout_2.addWidget(self.VideoNameInput)
         self.VideoWidthInput = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoWidthInput.sizePolicy().hasHeightForWidth())
+        self.VideoWidthInput.setSizePolicy(sizePolicy)
+        self.VideoWidthInput.setMinimumSize(QtCore.QSize(160, 10))
+        self.VideoWidthInput.setMaximumSize(QtCore.QSize(160, 10))
         font = QtGui.QFont()
         font.setBold(False)
         font.setWeight(50)
@@ -237,6 +423,13 @@ class Ui_MainWindow(object):
         self.VideoWidthInput.setObjectName("VideoWidthInput")
         self.horizontalLayout_2.addWidget(self.VideoWidthInput)
         self.VideoHeightInput = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoHeightInput.sizePolicy().hasHeightForWidth())
+        self.VideoHeightInput.setSizePolicy(sizePolicy)
+        self.VideoHeightInput.setMinimumSize(QtCore.QSize(160, 10))
+        self.VideoHeightInput.setMaximumSize(QtCore.QSize(160, 10))
         font = QtGui.QFont()
         font.setBold(False)
         font.setWeight(50)
@@ -246,36 +439,78 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.VideoHeightInput)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.VideoOutputLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.VideoOutputLabel.sizePolicy().hasHeightForWidth())
+        self.VideoOutputLabel.setSizePolicy(sizePolicy)
+        self.VideoOutputLabel.setMinimumSize(QtCore.QSize(480, 15))
+        self.VideoOutputLabel.setMaximumSize(QtCore.QSize(480, 15))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
         self.VideoOutputLabel.setFont(font)
         self.VideoOutputLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.VideoOutputLabel.setObjectName("VideoOutputLabel")
-        self.verticalLayout.addWidget(self.VideoOutputLabel)
+        self.verticalLayout.addWidget(self.VideoOutputLabel, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.Radio_6K = QtWidgets.QRadioButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Radio_6K.sizePolicy().hasHeightForWidth())
+        self.Radio_6K.setSizePolicy(sizePolicy)
+        self.Radio_6K.setMinimumSize(QtCore.QSize(0, 20))
+        self.Radio_6K.setMaximumSize(QtCore.QSize(16777215, 20))
         self.Radio_6K.setObjectName("Radio_6K")
         self.verticalLayout_2.addWidget(self.Radio_6K, 0, QtCore.Qt.AlignHCenter)
         self.Radio_4K = QtWidgets.QRadioButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Radio_4K.sizePolicy().hasHeightForWidth())
+        self.Radio_4K.setSizePolicy(sizePolicy)
+        self.Radio_4K.setMinimumSize(QtCore.QSize(0, 20))
+        self.Radio_4K.setMaximumSize(QtCore.QSize(16777215, 20))
         self.Radio_4K.setObjectName("Radio_4K")
         self.verticalLayout_2.addWidget(self.Radio_4K, 0, QtCore.Qt.AlignHCenter)
         self.Radio_Both = QtWidgets.QRadioButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Radio_Both.sizePolicy().hasHeightForWidth())
+        self.Radio_Both.setSizePolicy(sizePolicy)
+        self.Radio_Both.setMinimumSize(QtCore.QSize(0, 20))
+        self.Radio_Both.setMaximumSize(QtCore.QSize(16777215, 20))
         self.Radio_Both.setObjectName("Radio_Both")
         self.verticalLayout_2.addWidget(self.Radio_Both, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout.addLayout(self.verticalLayout_2)
         self.AdvancedSettingsLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.AdvancedSettingsLabel.sizePolicy().hasHeightForWidth())
+        self.AdvancedSettingsLabel.setSizePolicy(sizePolicy)
+        self.AdvancedSettingsLabel.setMinimumSize(QtCore.QSize(480, 0))
+        self.AdvancedSettingsLabel.setMaximumSize(QtCore.QSize(480, 16777215))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
         self.AdvancedSettingsLabel.setFont(font)
         self.AdvancedSettingsLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.AdvancedSettingsLabel.setObjectName("AdvancedSettingsLabel")
-        self.verticalLayout.addWidget(self.AdvancedSettingsLabel)
+        self.verticalLayout.addWidget(self.AdvancedSettingsLabel, 0, QtCore.Qt.AlignHCenter)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.BitrateLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.BitrateLabel.sizePolicy().hasHeightForWidth())
+        self.BitrateLabel.setSizePolicy(sizePolicy)
+        self.BitrateLabel.setMinimumSize(QtCore.QSize(240, 20))
+        self.BitrateLabel.setMaximumSize(QtCore.QSize(240, 20))
         self.BitrateLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.BitrateLabel.setObjectName("BitrateLabel")
         self.horizontalLayout_3.addWidget(self.BitrateLabel)
@@ -285,27 +520,55 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.BitrateInput.sizePolicy().hasHeightForWidth())
         self.BitrateInput.setSizePolicy(sizePolicy)
-        self.BitrateInput.setMinimumSize(QtCore.QSize(0, 25))
-        self.BitrateInput.setMaximumSize(QtCore.QSize(600, 25))
+        self.BitrateInput.setMinimumSize(QtCore.QSize(200, 25))
+        self.BitrateInput.setMaximumSize(QtCore.QSize(240, 25))
         self.BitrateInput.setObjectName("BitrateInput")
         self.horizontalLayout_3.addWidget(self.BitrateInput)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
         self.SaveLocation = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.SaveLocation.sizePolicy().hasHeightForWidth())
+        self.SaveLocation.setSizePolicy(sizePolicy)
+        self.SaveLocation.setMinimumSize(QtCore.QSize(480, 20))
+        self.SaveLocation.setMaximumSize(QtCore.QSize(480, 20))
         self.SaveLocation.setAlignment(QtCore.Qt.AlignCenter)
         self.SaveLocation.setObjectName("SaveLocation")
         self.verticalLayout.addWidget(self.SaveLocation)
         self.SaveLocationButton = QtWidgets.QPushButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.SaveLocationButton.sizePolicy().hasHeightForWidth())
+        self.SaveLocationButton.setSizePolicy(sizePolicy)
+        self.SaveLocationButton.setMinimumSize(QtCore.QSize(480, 23))
+        self.SaveLocationButton.setMaximumSize(QtCore.QSize(480, 23))
         self.SaveLocationButton.setObjectName("SaveLocationButton")
-        self.verticalLayout.addWidget(self.SaveLocationButton)
+        self.verticalLayout.addWidget(self.SaveLocationButton, 0, QtCore.Qt.AlignHCenter)
         self.ConvertBtn = QtWidgets.QPushButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.ConvertBtn.sizePolicy().hasHeightForWidth())
+        self.ConvertBtn.setSizePolicy(sizePolicy)
+        self.ConvertBtn.setMinimumSize(QtCore.QSize(480, 27))
+        self.ConvertBtn.setMaximumSize(QtCore.QSize(480, 27))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.ConvertBtn.setFont(font)
         self.ConvertBtn.setObjectName("ConvertBtn")
-        self.verticalLayout.addWidget(self.ConvertBtn)
+        self.verticalLayout.addWidget(self.ConvertBtn, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout_4 = QtWidgets.QVBoxLayout()
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.versionLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.versionLabel.sizePolicy().hasHeightForWidth())
+        self.versionLabel.setSizePolicy(sizePolicy)
+        self.versionLabel.setMinimumSize(QtCore.QSize(480, 15))
+        self.versionLabel.setMaximumSize(QtCore.QSize(480, 15))
         self.versionLabel.setObjectName("versionLabel")
         self.verticalLayout_4.addWidget(self.versionLabel, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout.addLayout(self.verticalLayout_4)
@@ -418,10 +681,6 @@ class Ui_MainWindow(object):
             #print("Play")
             self.pushButton.setText("Pause")
 
-    def media_end(self):
-            if self.mediaplayer.state() == QMediaPlayer.EndOfMedia:
-                print("end of media")
-
     def position_changed(self,position):
         self.horizontalSlider.setValue(position)
         
@@ -440,8 +699,9 @@ class Ui_MainWindow(object):
         self.label.setText(str(int(MinutesGet)) + ":" + str(int(seconds%60)))
 
     def end_media(self,status):
-        if self.mediaplayer.state() == QMediaPlayer.EndOfMedia:
-            print("Bingo")
+        if self.mediaplayer.state() == 0:
+            play = True
+            self.pushButton.setText("Play")
 
     
     def file_btn_clicked (self):
@@ -473,6 +733,8 @@ class Ui_MainWindow(object):
 
     def location_btn_clicked(self):
         global saveLocation
+        global directorySelected
+        directorySelected = False
         directoryPath=QFileDialog.getExistingDirectory(None, "Get Any File");
         final_save_location = "file:"+directoryPath
         saveLocation = final_save_location
@@ -514,11 +776,11 @@ class Ui_MainWindow(object):
 
     def evt_worker_finished(self):
         #this will indicate that the video conversion is complete and the loading screen can be removed 
-        print("Worker Thread Complete")
+        #print("Worker Thread Complete")
         MainWindow.setEnabled(True)
 
         #UI pop up to say the video has been converted
-        self.pop_up_UI("Success!","The video was converted successfully.")
+        self.video_pop_up("Success!","The video was converted successfully.")
         
 
     def add_path_variable():
@@ -536,6 +798,20 @@ class Ui_MainWindow(object):
         path = os.environ.get('PATH')
         print(path)
 
+    def video_pop_up(self,titleText,bodyText):
+        global conversionComplete
+        if conversionComplete:
+            msg = QMessageBox()
+            msg.setWindowTitle(titleText)
+            msg.setText(bodyText)
+            x = msg.exec_()
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("There is a file with the same name in the directory, please remove and re convert.")
+            x = msg.exec_()
+        conversionComplete = False
+            
     def pop_up_UI(self,titleText,bodyText):
         msg = QMessageBox()
         msg.setWindowTitle(titleText)

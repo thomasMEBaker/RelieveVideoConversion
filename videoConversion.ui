@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +14,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -24,8 +27,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>500</width>
-    <height>678</height>
+    <width>750</width>
+    <height>1017</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -33,8 +36,26 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+    <item alignment="Qt::AlignHCenter">
      <widget class="QLabel" name="TitleLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>480</width>
+        <height>20</height>
+       </size>
+      </property>
       <property name="font">
        <font>
         <pointsize>13</pointsize>
@@ -114,6 +135,18 @@
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <widget class="QPushButton" name="pushButton">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>23</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>23</height>
+         </size>
+        </property>
         <property name="text">
          <string>PushButton</string>
         </property>
@@ -121,6 +154,18 @@
       </item>
       <item>
        <widget class="QSlider" name="horizontalSlider">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>23</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>23</height>
+         </size>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -128,6 +173,18 @@
       </item>
       <item>
        <widget class="QLabel" name="label">
+        <property name="minimumSize">
+         <size>
+          <width>47</width>
+          <height>23</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>47</width>
+          <height>23</height>
+         </size>
+        </property>
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -135,15 +192,39 @@
       </item>
      </layout>
     </item>
-    <item>
+    <item alignment="Qt::AlignHCenter">
      <widget class="QPushButton" name="FileBtn">
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>480</width>
+        <height>25</height>
+       </size>
+      </property>
       <property name="text">
        <string>Open File</string>
       </property>
      </widget>
     </item>
-    <item>
+    <item alignment="Qt::AlignHCenter">
      <widget class="QLabel" name="VideoOutputLabel_2">
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>15</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>480</width>
+        <height>15</height>
+       </size>
+      </property>
       <property name="font">
        <font>
         <weight>75</weight>
@@ -162,6 +243,24 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="VideoNameLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <weight>75</weight>
@@ -178,6 +277,24 @@
       </item>
       <item>
        <widget class="QLabel" name="VideoWidthLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <weight>75</weight>
@@ -194,6 +311,24 @@
       </item>
       <item>
        <widget class="QLabel" name="VideoHeightLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <weight>75</weight>
@@ -214,10 +349,22 @@
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QLabel" name="VideoNameInput">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
-          <height>0</height>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
          </size>
         </property>
         <property name="font">
@@ -236,6 +383,24 @@
       </item>
       <item>
        <widget class="QLabel" name="VideoWidthInput">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <weight>50</weight>
@@ -252,6 +417,24 @@
       </item>
       <item>
        <widget class="QLabel" name="VideoHeightInput">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>160</width>
+          <height>10</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <weight>50</weight>
@@ -268,8 +451,26 @@
       </item>
      </layout>
     </item>
-    <item>
+    <item alignment="Qt::AlignHCenter">
      <widget class="QLabel" name="VideoOutputLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>15</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>480</width>
+        <height>15</height>
+       </size>
+      </property>
       <property name="font">
        <font>
         <weight>75</weight>
@@ -288,6 +489,24 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item alignment="Qt::AlignHCenter">
        <widget class="QRadioButton" name="Radio_6K">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="text">
          <string>6K Video</string>
         </property>
@@ -295,6 +514,24 @@
       </item>
       <item alignment="Qt::AlignHCenter">
        <widget class="QRadioButton" name="Radio_4K">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="text">
          <string>4K Video</string>
         </property>
@@ -302,6 +539,24 @@
       </item>
       <item alignment="Qt::AlignHCenter">
        <widget class="QRadioButton" name="Radio_Both">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="text">
          <string>Both</string>
         </property>
@@ -309,8 +564,26 @@
       </item>
      </layout>
     </item>
-    <item>
+    <item alignment="Qt::AlignHCenter">
      <widget class="QLabel" name="AdvancedSettingsLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>480</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="font">
        <font>
         <weight>75</weight>
@@ -329,6 +602,24 @@
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QLabel" name="BitrateLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>240</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>240</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="text">
          <string>Bitrate</string>
         </property>
@@ -347,13 +638,13 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
+          <width>200</width>
           <height>25</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>600</width>
+          <width>240</width>
           <height>25</height>
          </size>
         </property>
@@ -363,6 +654,24 @@
     </item>
     <item>
      <widget class="QLabel" name="SaveLocation">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>480</width>
+        <height>20</height>
+       </size>
+      </property>
       <property name="text">
        <string>N/A</string>
       </property>
@@ -371,15 +680,51 @@
       </property>
      </widget>
     </item>
-    <item>
+    <item alignment="Qt::AlignHCenter">
      <widget class="QPushButton" name="SaveLocationButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>23</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>480</width>
+        <height>23</height>
+       </size>
+      </property>
       <property name="text">
        <string>Save Location</string>
       </property>
      </widget>
     </item>
-    <item>
+    <item alignment="Qt::AlignHCenter">
      <widget class="QPushButton" name="ConvertBtn">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>27</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>480</width>
+        <height>27</height>
+       </size>
+      </property>
       <property name="font">
        <font>
         <pointsize>12</pointsize>
@@ -394,6 +739,24 @@
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="versionLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>480</width>
+          <height>15</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>480</width>
+          <height>15</height>
+         </size>
+        </property>
         <property name="text">
          <string>V1.0</string>
         </property>
