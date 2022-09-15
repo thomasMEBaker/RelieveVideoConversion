@@ -5,22 +5,17 @@
 # API refence https://kkroening.github.io/ffmpeg-python/
 
 #To Do
-#trim length of video for 6k
+#hevc output
 #error handling 
 #change to custom bitrate
 #sort layout on other computers e.g. laptop
+
+#issue with trim time on the 4 and 6k conversion - format? Space is causing the issue.
 
 #Testing
 # Tidy code
 # pyinstaller test
 # full installation test
-
-
-#useful - https://github.com/kkroening/ffmpeg-python/issues/155
-#https://github.com/kkroening/ffmpeg-python/issues/184
-
-#https://stackoverflow.com/questions/60123218/ffmpeg-python-trim-and-concat-doesnt-work
-##https://github.com/kkroening/ffmpeg-python/issues/324
 
 import sys
 import ffmpeg
@@ -199,11 +194,10 @@ def convertion4k(fname):
     else:
         if directorySelected:
             if global_checkbox:
-                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -c:v libx264 -c:a copy " +saveLocation+"//Tablet//" +name+'.mp4')
+                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -vf scale=4096:2048 -c:v libx264 -c:a copy " +saveLocation+"//Tablet//" +name+'.mp4')
+                #and if you want to retain aspect ratio just give height as -1 and it will automatically resize based on the width e.g. -vf scale="720:-1"
                 print(valueCheck)
                 os.system(valueCheck)
-                #stream = ffmpeg.input(fname).filter('trim',start_pts=10,end_pts=6000)
-                #stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+'.mp4')
                 conversionComplete = True
             else:
                 stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
@@ -211,13 +205,10 @@ def convertion4k(fname):
                 conversionComplete = True
         else:
             if global_checkbox:
-                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -c:v libx264 -c:a copy " +saveLocation+"/RovrConvertedVideos/Tablet/"+name+'.mp4')
+                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -vf scale=4096:2048 -c:v libx264 -c:a copy " +saveLocation+"/RovrConvertedVideos/Tablet/"+name+'.mp4')
                 print(valueCheck)
                 os.system(valueCheck)
                 conversionComplete = True
-                #stream = ffmpeg.input(fname).filter('trim',start_pts=10,end_pts=20)
-                #stream = ffmpeg.input(fname).filter('trim',start="00:00:00",end ="00:00:10")
-                #stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+'.mp4')
             else:
                 stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
                 ffmpeg.run(stream)
@@ -237,12 +228,25 @@ def convertion6k(fname):
             conversionComplete = False
     else:
         if directorySelected:
-            stream = ffmpeg.output(stream, saveLocation+"//Headset//"+name+".mp4")
+            if global_checkbox:
+               valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -vf scale=5760:2880 -c:v libx264 -c:a copy " +saveLocation+"//Headset//" +name+'.mp4')
+               print(valueCheck)
+               os.system(valueCheck)
+               conversionComplete = True
+            else:
+                stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
+                ffmpeg.run(stream)
+                conversionComplete = True
         else:
-            stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Headset/"+name+".mp4")
-        ffmpeg.run(stream)
-        conversionComplete = True
-
+            if global_checkbox:
+                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -vf scale=5760:2880 -c:v libx264 -c:a copy " +saveLocation+"/RovrConvertedVideos/Headset/"+name+'.mp4')
+                print(valueCheck)
+                os.system(valueCheck)
+                conversionComplete = True
+            else:
+                stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
+                ffmpeg.run(stream)
+                conversionComplete = True
 def module_exists(module_name):
     try:
         __import__(module_name)
@@ -654,7 +658,7 @@ class Ui_MainWindow(object):
         self.pushButton.clicked.connect(lambda: self.playVideo())
 
         #needs formatting to minutes and seconds etc
-        self.label.setText("0:0:0")
+        self.label.setText("00:00:00")
         self.label.setEnabled(False)
         self.horizontalSlider.setEnabled(False)
 
@@ -724,8 +728,8 @@ class Ui_MainWindow(object):
             HoursGet = RemainingSec // 3600
             RemainingSec %= 3600
             MinutesGet = RemainingSec // 60
-            self.VideoStart.setText("00:00:00")
-            self.VideoEnd.setText(str(int(MinutesGet)) + ":" + str(int(video_length%60)))
+            self.VideoStart.setText("00:00:0")
+            self.VideoEnd.setText("00:"+str(int(MinutesGet)) + ":" + str(int(video_length%60)))
             global_checkbox = True
         else:
             self.VideoStart.setEnabled(False)
