@@ -5,7 +5,8 @@
 # API refence https://kkroening.github.io/ffmpeg-python/
 
 #To Do
-#possible option to trim length of video
+#trim length of video for 6k
+#error handling 
 #change to custom bitrate
 #sort layout on other computers e.g. laptop
 
@@ -14,8 +15,12 @@
 # pyinstaller test
 # full installation test
 
+
 #useful - https://github.com/kkroening/ffmpeg-python/issues/155
 #https://github.com/kkroening/ffmpeg-python/issues/184
+
+#https://stackoverflow.com/questions/60123218/ffmpeg-python-trim-and-concat-doesnt-work
+##https://github.com/kkroening/ffmpeg-python/issues/324
 
 import sys
 import ffmpeg
@@ -48,7 +53,11 @@ videoName = ""
 videoWidth = ""
 videoHeight = ""
 conversionComplete = False
-video_length = 0.0;
+video_length = 0.0
+
+global_checkbox = False
+trim_start = ""
+trim_end = ""
 
 
 def show_exception_and_exit(exc_type, exc_value, tb):
@@ -175,7 +184,6 @@ def checkfile(filename,location,fourSix):
                 conversionComplete = True
                 #print("File going ahead")
     
-    
 def convertion4k(fname):
     #resoltuion at 4096/2048
     global conversionComplete
@@ -186,25 +194,34 @@ def convertion4k(fname):
     name_size = len(mp4_removal.split('/')) - 1
     filename_split = mp4_removal.split('/')
     name = filename_split[name_size]
-    #print("Dir selected -" + str(directorySelected))
     if checkfile(name,saveLocation,False) == False:
-        #print ("Checkfile returned False")
         conversionComplete = False
     else:
         if directorySelected:
-            #print (fname)
-            stream = ffmpeg.input(fname).filter('trim',start=33.3)
-            stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+'_trimmed.mp4')
-            #original - stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
-            #print("saveLocation+"//Tablet//"+name+".mp4)
+            if global_checkbox:
+                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -c:v libx264 -c:a copy " +saveLocation+"//Tablet//" +name+'.mp4')
+                print(valueCheck)
+                os.system(valueCheck)
+                #stream = ffmpeg.input(fname).filter('trim',start_pts=10,end_pts=6000)
+                #stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+'.mp4')
+                conversionComplete = True
+            else:
+                stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
+                ffmpeg.run(stream)
+                conversionComplete = True
         else:
-            #print (fname)
-            stream = ffmpeg.input(fname).filter('trim',start=33.3)
-            stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+'_trimmed.mp4')
-            #original - stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
-            #print("here")
-        ffmpeg.run(stream)
-        conversionComplete = True
+            if global_checkbox:
+                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -c:v libx264 -c:a copy " +saveLocation+"/RovrConvertedVideos/Tablet/"+name+'.mp4')
+                print(valueCheck)
+                os.system(valueCheck)
+                conversionComplete = True
+                #stream = ffmpeg.input(fname).filter('trim',start_pts=10,end_pts=20)
+                #stream = ffmpeg.input(fname).filter('trim',start="00:00:00",end ="00:00:10")
+                #stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+'.mp4')
+            else:
+                stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
+                ffmpeg.run(stream)
+                conversionComplete = True
 
 def convertion6k(fname):
     #resoltuion at 5760/2880
@@ -216,27 +233,15 @@ def convertion6k(fname):
     name_size = len(mp4_removal.split('/')) - 1
     filename_split = mp4_removal.split('/')
     name = filename_split[name_size]
-    #print("Dir selected -" + str(directorySelected))
     if checkfile(name,saveLocation,True) == False:
-            #print ("Checkfile returned False")
             conversionComplete = False
     else:
         if directorySelected:
             stream = ffmpeg.output(stream, saveLocation+"//Headset//"+name+".mp4")
-            #print("saveLocation+"//Tablet//"+name+".mp4)
         else:
             stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Headset/"+name+".mp4")
-            #print("here")
         ffmpeg.run(stream)
         conversionComplete = True
-
-
-def cropInputFile(fname):
-    #stream = ffmpeg.input(fname+'.mp4').filter('trim',duration=33.3) to just give an overall length
-    #stream = ffmpeg.input(fname+'.mp4').filter('trim',start=33.3,end=50.0) #not 100% working
-    #stream = ffmpeg.output(stream, fname+'_trimmed.mp4')
-    #ffmpeg.run(stream)
-    print("Croppped Video")
 
 def module_exists(module_name):
     try:
@@ -626,6 +631,10 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        self.VideoStart.textChanged.connect(lambda: self.videoStartUpdate())
+        self.VideoEnd.textChanged.connect(lambda: self.videoEndUpdate())
+
+        
         #open file button
         self.FileBtn.clicked.connect(lambda: self.file_btn_clicked())
 
@@ -688,6 +697,15 @@ class Ui_MainWindow(object):
         self.ConvertBtn.setText(_translate("MainWindow", "Convert File(s)"))
         self.versionLabel.setText(_translate("MainWindow", "V1.0"))
 
+    def videoStartUpdate(self):
+        global trim_start
+        trim_start = self.VideoStart.toPlainText()
+        #print(trim_start)
+
+    def videoEndUpdate(self):
+        global trim_end
+        trim_end = self.VideoEnd.toPlainText()
+        #print(trim_end)
 
     def bitrate_check(self):
         if self.BitrateCheck.isChecked():
@@ -697,6 +715,7 @@ class Ui_MainWindow(object):
 
 
     def trim_check(self):
+        global global_checkbox
         if self.checkBox.isChecked():
             self.VideoStart.setEnabled(True)
             self.VideoEnd.setEnabled(True)
@@ -705,13 +724,15 @@ class Ui_MainWindow(object):
             HoursGet = RemainingSec // 3600
             RemainingSec %= 3600
             MinutesGet = RemainingSec // 60
-            self.VideoStart.setText("0:00")
+            self.VideoStart.setText("00:00:00")
             self.VideoEnd.setText(str(int(MinutesGet)) + ":" + str(int(video_length%60)))
+            global_checkbox = True
         else:
             self.VideoStart.setEnabled(False)
             self.VideoEnd.setEnabled(False)
             self.VideoStart.setText("")
             self.VideoEnd.setText("")
+            global_checkbox = False
             
     def radio_check(self):
         global radiobtn_4
