@@ -19,6 +19,7 @@
 
 import sys
 import ffmpeg
+import subprocess
 import os
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
@@ -194,10 +195,11 @@ def convertion4k(fname):
     else:
         if directorySelected:
             if global_checkbox:
-                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -vf scale=4096:2048 -c:v libx264 -c:a copy " +saveLocation+"//Tablet//" +name+'.mp4')
+                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + '"' + fname[5:] + '"' + ' -vf scale=4096:2048 -c:v libx264 -c:a copy ' +saveLocation+'//Tablet//' +name+ '.mp4')
                 #and if you want to retain aspect ratio just give height as -1 and it will automatically resize based on the width e.g. -vf scale="720:-1"
                 print(valueCheck)
-                os.system(valueCheck)
+                subprocess.call([valueCheck])
+                #os.system(valueCheck)
                 conversionComplete = True
             else:
                 stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
@@ -205,9 +207,10 @@ def convertion4k(fname):
                 conversionComplete = True
         else:
             if global_checkbox:
-                valueCheck = str("ffmpeg -ss "+ trim_start +" -to " + trim_end + " -i " + fname[5:] + " -vf scale=4096:2048 -c:v libx264 -c:a copy " +saveLocation+"/RovrConvertedVideos/Tablet/"+name+'.mp4')
+                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + "'" + fname[5:] + "'" + ' -vf scale=4096:2048 -c:v libx264 -c:a copy ' +saveLocation+'/RovrConvertedVideos/Tablet/'+name+'.mp4')
                 print(valueCheck)
-                os.system(valueCheck)
+                #os.system(valueCheck)
+                subprocess.call([valueCheck])
                 conversionComplete = True
             else:
                 stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
