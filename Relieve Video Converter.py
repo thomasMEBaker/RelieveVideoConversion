@@ -19,7 +19,6 @@
 
 import sys
 import ffmpeg
-import subprocess
 import os
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
@@ -54,6 +53,7 @@ video_length = 0.0
 global_checkbox = False
 trim_start = ""
 trim_end = ""
+global_fname  = ""
 
 
 def show_exception_and_exit(exc_type, exc_value, tb):
@@ -183,6 +183,8 @@ def checkfile(filename,location,fourSix):
 def convertion4k(fname):
     #resoltuion at 4096/2048
     global conversionComplete
+    global global_fname
+    fname = global_fname
     createFileStructure(saveLocation)
     stream = ffmpeg.input(fname)
     stream = ffmpeg.filter(stream,"scale",4096,2048)
@@ -195,11 +197,10 @@ def convertion4k(fname):
     else:
         if directorySelected:
             if global_checkbox:
-                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + '"' + fname[5:] + '"' + ' -vf scale=4096:2048 -c:v libx264 -c:a copy ' +saveLocation+'//Tablet//' +name+ '.mp4')
+                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx264 -c:a copy ' +saveLocation+'//Tablet//' +name+ '.mp4')
                 #and if you want to retain aspect ratio just give height as -1 and it will automatically resize based on the width e.g. -vf scale="720:-1"
                 print(valueCheck)
-                subprocess.call([valueCheck])
-                #os.system(valueCheck)
+                os.system(valueCheck)
                 conversionComplete = True
             else:
                 stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
@@ -207,10 +208,9 @@ def convertion4k(fname):
                 conversionComplete = True
         else:
             if global_checkbox:
-                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + "'" + fname[5:] + "'" + ' -vf scale=4096:2048 -c:v libx264 -c:a copy ' +saveLocation+'/RovrConvertedVideos/Tablet/'+name+'.mp4')
+                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx264 -c:a copy ' +saveLocation+'/RovrConvertedVideos/Tablet/'+name+ '.mp4')
                 print(valueCheck)
-                #os.system(valueCheck)
-                subprocess.call([valueCheck])
+                os.system(valueCheck)
                 conversionComplete = True
             else:
                 stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
@@ -881,7 +881,7 @@ class Ui_MainWindow(object):
             final_location  = "file:"+final_location[1:-1]
             fileLocation = final_location
             self.videoInformation(fileLocation)
-            self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(str(fileLocation))))
+            self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(str(global_fname))))
             self.pushButton.setEnabled(True)
             self.horizontalSlider.setEnabled(True)
             self.label.setEnabled(True)
@@ -911,6 +911,7 @@ class Ui_MainWindow(object):
 
 
     def videoInformation(self,fname):
+        global global_fname
         global video_length
         probe = ffmpeg.probe(fname)
         video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
@@ -918,10 +919,27 @@ class Ui_MainWindow(object):
         height = int(video_stream['height'])
         video_length = float(video_stream['duration'])
         
-
         file_index = len(fname.split('/')) - 1
         filename_short = fname.split('/')
         filename_short = filename_short[file_index]
+        
+        #print("original info - "+ fname)
+        mp4_removal = fname[:-4]
+        #print("removed info - "+ mp4_removal)
+        split = mp4_removal.split("/")
+        #print(split)
+        fileName = split[-1]
+        #print(fileName)
+        replaced_filename = fileName.replace(" ", "_")
+        formatted_file_path = fname.replace(fileName,replaced_filename)
+        print (fname)
+        print (formatted_file_path)
+        fname = fname[5:]
+        formatted_file_path = formatted_file_path[5:]
+
+        os.rename(fname,formatted_file_path)
+
+        global_fname = "file:"+formatted_file_path
 
         self.VideoNameInput.setText(str(filename_short))
         self.VideoWidthInput.setText(str(width))
