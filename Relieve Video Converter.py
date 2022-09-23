@@ -54,6 +54,7 @@ global_checkbox = False
 trim_start = ""
 trim_end = ""
 global_fname  = ""
+bitrate = 90000
 
 
 def show_exception_and_exit(exc_type, exc_value, tb):
@@ -197,7 +198,7 @@ def convertion4k(fname):
     else:
         if directorySelected:
             if global_checkbox:
-                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx264 -c:a copy ' +saveLocation+'//Tablet//' +name+ '.mp4')
+                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx265 -c:a copy ' +saveLocation+'//Tablet//' +name+ '.mp4')
                 #and if you want to retain aspect ratio just give height as -1 and it will automatically resize based on the width e.g. -vf scale="720:-1"
                 print(valueCheck)
                 os.system(valueCheck)
@@ -208,7 +209,7 @@ def convertion4k(fname):
                 conversionComplete = True
         else:
             if global_checkbox:
-                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx264 -c:a copy ' +saveLocation+'/RovrConvertedVideos/Tablet/'+name+ '.mp4')
+                valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx265 -c:a copy ' +saveLocation+'/RovrConvertedVideos/Tablet/'+name+ '.mp4')
                 print(valueCheck)
                 os.system(valueCheck)
                 conversionComplete = True
@@ -794,8 +795,10 @@ class Ui_MainWindow(object):
     def bitrate_check(self):
         if self.BitrateCheck.isChecked():
             self.BitrateInput.setEnabled(True)
+            self.BitrateInput.setText(str(bitrate))
         else:
             self.BitrateInput.setEnabled(False)
+            self.BitrateInput.setText("")
 
 
     def trim_check(self):
