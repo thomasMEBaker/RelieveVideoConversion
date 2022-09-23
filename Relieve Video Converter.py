@@ -198,21 +198,47 @@ def convertion4k(fname):
     else:
         if directorySelected:
             if global_checkbox:
+                #from here - https://trac.ffmpeg.org/wiki/Encode/H.265
+                #pass 1  - ffmpeg -y -i input -c:v libx265 -b:v 2600k -x265-params pass=1 -an -f null /dev/null && \
+                pass_1 = str('ffmpeg -y -i ' + global_fname + ' -c:v libx265 -b:v 2600k -x265-params pass=1 -an -f null NUL &&^ ')
+                #pass_1 = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx265 -b:v 2600k -x265-params pass=1 -an -f null NUL && ^ ')
+                print(pass_1)
+                os.system(pass_1)
+                pass_2 = str('ffmpeg -i ' + global_fname + ' -c:v libx265 -b:v 2600k -x265-params pass=2 -c:a aac -b:a 128k wham.mp4')
+                print(pass_2)
+                #pass 2 - ffmpeg -i input -c:v libx265 -b:v 2600k -x265-params pass=2 -c:a aac -b:a 128k output.mp4
+                #pass_2 = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx265 -b:v 2600k -x265-params pass=2 -c:a aac -b:a 128k .mp4')
+                os.system(pass_2)
+                conversionComplete = True
+                
+                """
                 valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx265 -c:a copy ' +saveLocation+'//Tablet//' +name+ '.mp4')
                 #and if you want to retain aspect ratio just give height as -1 and it will automatically resize based on the width e.g. -vf scale="720:-1"
                 print(valueCheck)
                 os.system(valueCheck)
                 conversionComplete = True
+                """
             else:
                 stream = ffmpeg.output(stream, saveLocation+"//Tablet//"+name+".mp4")
                 ffmpeg.run(stream)
                 conversionComplete = True
         else:
             if global_checkbox:
+                pass_1 = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -y -i ' + global_fname + ' -c:v libx265 -b:v ' + str(bitrate) + 'k -x265-params pass=1 -an -f null NUL &&^ ')
+                print(pass_1)
+                os.system(pass_1)
+                pass_2 = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -c:v libx265 -b:v ' + str(bitrate) + 'k -x265-params pass=2 -c:a aac -b:a 128k ' +saveLocation+'/RovrConvertedVideos/Tablet//' +name+ '.mp4')
+                print(pass_2)
+                os.system(pass_2)
+                conversionComplete = True
+
+                
+                """
                 valueCheck = str('ffmpeg -ss '+ trim_start +' -to ' + trim_end + ' -i ' + global_fname + ' -vf scale=4096:2048 -c:v libx265 -c:a copy ' +saveLocation+'/RovrConvertedVideos/Tablet/'+name+ '.mp4')
                 print(valueCheck)
                 os.system(valueCheck)
                 conversionComplete = True
+                """
             else:
                 stream = ffmpeg.output(stream, saveLocation+"/RovrConvertedVideos/Tablet/"+name+".mp4")
                 ffmpeg.run(stream)
@@ -718,6 +744,7 @@ class Ui_MainWindow(object):
 
         self.VideoStart.textChanged.connect(lambda: self.videoStartUpdate())
         self.VideoEnd.textChanged.connect(lambda: self.videoEndUpdate())
+        self.BitrateInput.textChanged.connect(lambda: self.bitrateUpdate())
 
         
         #open file button
@@ -791,6 +818,10 @@ class Ui_MainWindow(object):
         global trim_end
         trim_end = self.VideoEnd.toPlainText()
         #print(trim_end)
+
+    def bitrateUpdate(self):
+        global bitrate
+        bitrate = self.BitrateInput.toPlainText()
 
     def bitrate_check(self):
         if self.BitrateCheck.isChecked():
